@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Meal Order Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://apis.google.com/js/api.js"></script>
     </head>
 <body>
 
@@ -17,7 +16,7 @@
     <main>
         <div id="ios-tabs" class="tabs hidden">
             <button class="tab-link active" onclick="openTab(event, 'List')">Meal List</button>
-            <button class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
+            <button id="import-tab-button" class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
         </div>
 
         <div id="List" class="tab-content">
