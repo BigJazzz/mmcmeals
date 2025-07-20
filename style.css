@@ -1,0 +1,164 @@
+:root {
+    --primary-color: #4a90e2;
+    --background-color: #f4f4f9;
+    --text-color: #333;
+    --red-alert: #e74c3c;
+    --card-bg: #ffffff;
+    --shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 1rem;
+    -webkit-tap-highlight-color: transparent;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+}
+
+#meal-counter {
+    font-size: 1.5rem;
+    font-weight: bold;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    min-width: 40px;
+    text-align: center;
+}
+
+#meal-counter.alert {
+    background-color: var(--red-alert);
+}
+
+main {
+    padding: 0 1rem;
+}
+
+/* Tabs for iOS */
+.tabs {
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+
+.tab-link {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 1rem;
+}
+
+.tab-link.active {
+    border-bottom: 3px solid var(--primary-color);
+    font-weight: bold;
+}
+
+.tab-content {
+    display: block; /* Default state */
+}
+
+/* Meal List */
+#meal-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    /* Responsive columns: 2 for small screens, 4 for tablets and up */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    #meal-list {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.meal-item {
+    background-color: var(--card-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: transform 0.2s;
+}
+
+.meal-item:active {
+    transform: scale(0.96);
+}
+
+.meal-item input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+.meal-item label {
+    flex-grow: 1;
+    font-size: 1.1rem;
+    line-break: anywhere;
+}
+
+.meal-item input[type="checkbox"]:checked + label {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Upload & Auth */
+.upload-area, #auth-container {
+    text-align: center;
+    padding: 2rem;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+}
+
+button, input[type="file"] {
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+#authorize_button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+.spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

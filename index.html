@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Meal Order Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Meal Tracker</h1>
+        <div id="meal-counter">--</div>
+    </header>
+
+    <main>
+        <div id="ios-tabs" class="tabs hidden">
+            <button class="tab-link active" onclick="openTab(event, 'List')">Meal List</button>
+            <button class="tab-link" onclick="openTab(event, 'Upload')">Upload PDF</button>
+        </div>
+
+        <div id="List" class="tab-content">
+            <div id="auth-container">
+                <button id="authorize_button">Link Google Sheet</button>
+            </div>
+            <div id="meal-list-container" class="hidden">
+                <ul id="meal-list">
+                    </ul>
+            </div>
+            <div id="loading-spinner" class="spinner hidden"></div>
+        </div>
+
+        <div id="Upload" class="tab-content hidden">
+            <div class="upload-area">
+                <p>Upload a new PDF order list. This will delete checked meals and replace the old list.</p>
+                <input type="file" id="pdf-upload" accept="application/pdf">
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
