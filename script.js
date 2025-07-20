@@ -9,6 +9,7 @@ window.onload = () => {
     const mealListContainer = document.getElementById('meal-list-container');
     const loadingSpinner = document.getElementById('loading-spinner');
     const pdfUploadInput = document.getElementById('pdf-upload');
+    const importEmailButton = document.getElementById('import-email-button'); // <-- ADD THIS
     const iosTabs = document.getElementById('ios-tabs');
     const uploadTabContent = document.getElementById('Upload');
 
@@ -54,6 +55,26 @@ window.onload = () => {
             setLoading(false);
         }
     }
+
+    // --- EVENT LISTENER FOR THE NEW BUTTON ---
+    importEmailButton.addEventListener('click', async () => {
+        setLoading(true); // Show the spinner
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+            const result = await response.json();
+
+            alert(result.message); // Show the success/error message from the script
+
+            if (result.status === 'success') {
+                await loadMealsFromSheet(); // Refresh the meal list if import was successful
+            }
+        } catch (err) {
+            console.error("Error triggering email import:", err);
+            alert("A client-side error occurred while trying to import from email.");
+        } finally {
+            setLoading(false); // Hide the spinner
+        }
+    });
 
     // --- PDF HANDLING ---
     pdfUploadInput.addEventListener('change', async (event) => {
