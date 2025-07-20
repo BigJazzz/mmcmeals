@@ -6,8 +6,7 @@
     <title>Meal Order Tracker</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-</head>
+    </head>
 <body>
 
     <header>
@@ -18,26 +17,22 @@
     <main>
         <div id="ios-tabs" class="tabs hidden">
             <button class="tab-link active" onclick="openTab(event, 'List')">Meal List</button>
-            <button class="tab-link" onclick="openTab(event, 'Upload')">Upload PDF</button>
+            <button class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
         </div>
 
         <div id="List" class="tab-content">
-            <div id="meal-list-container" class="hidden">
+            <div id="meal-list-container">
                 <ul id="meal-list">
                     </ul>
             </div>
-            <div id="loading-spinner" class="spinner hidden"></div>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
         </div>
 
         <div id="Upload" class="tab-content hidden">
             <div class="upload-area">
-                <p>Upload a new PDF order list. This will delete checked meals and replace the old list.</p>
-                <input type="file" id="pdf-upload" accept="application/pdf">
-                
-                <hr style="margin: 2rem 0;">
-
-                <p>Or, import the latest order directly from your Gmail.</p>
-                <button id="import-email-button">Import from Email</button> </div>
+                <p>Import the latest order directly from your Gmail.</p>
+                <button id="import-email-button">Import from Email</button>
+            </div>
         </div>
     </main>
 
