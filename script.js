@@ -1,6 +1,6 @@
 window.onload = () => {
     // --- CONFIGURATION ---
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqEAM17_m21V5hT2K9wuc2swieBYRJVjQl-mI9KcaMPUBmnMULvjvC6WDChknkfhT7/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv4lTtqAyle1X5-inx5FUmUXoXpAMGVr0wVGpFZgus0IOB_MEDvV11JcQKa325RLbf/exec';
 
     // --- DOM ELEMENTS ---
     const mealCounterEl = document.getElementById('meal-counter');
