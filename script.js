@@ -11,11 +11,23 @@ window.onload = () => {
 
     // --- APP STATE ---
     let meals = [];
-    const consumedToday = new Set(); // Track meals consumed in this session
+    const consumedToday = new Set();
+    let autoRefreshTimer; // Timer for the 6-hour auto-refresh
 
     // --- INITIALIZATION ---
     detectOS();
     loadMealsFromSheet();
+
+    // --- AUTO-REFRESH LOGIC ---
+    /**
+     * Resets the 6-hour timer that automatically refreshes the meal list.
+     * This is called on page load and after every user interaction.
+     */
+    function resetAutoRefreshTimer() {
+        clearTimeout(autoRefreshTimer); // Clear any existing timer
+        const sixHoursInMillis = 6 * 60 * 60 * 1000;
+        autoRefreshTimer = setTimeout(loadMealsFromSheet, sixHoursInMillis);
+    }
 
     // --- OS DETECTION & UI SETUP ---
     function detectOS() {
@@ -26,7 +38,6 @@ window.onload = () => {
             document.getElementById('Upload').style.display = 'none';
             document.getElementById('List').style.display = 'block';
         } else {
-            // For Android/Desktop, show the import button by default
             uploadTabContent.classList.remove('hidden');
         }
     }
@@ -44,6 +55,7 @@ window.onload = () => {
             alert("Could not load meals from the backend.");
         } finally {
             setLoading(false);
+            resetAutoRefreshTimer(); // Start the 6-hour timer after the list loads
         }
     }
 
@@ -77,13 +89,22 @@ window.onload = () => {
         updateMealCounter(availableMeals.length);
     }
 
+    /**
+     * Handles consuming a meal, with a 10-second timeout
+     * to re-enable the checkbox. Also resets the auto-refresh timer.
+     */
     async function consumeOneMeal(rowIndex) {
+        // Immediately update the UI to show the meal as consumed
         consumedToday.add(rowIndex);
         const meal = meals.find(m => m.row === rowIndex);
         if (meal) meal.remaining--;
         renderMealList();
 
+        // Reset the 6-hour refresh timer on user interaction
+        resetAutoRefreshTimer();
+
         try {
+            // Send the update to the Google Sheet
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -92,9 +113,17 @@ window.onload = () => {
                     payload: { row: rowIndex }
                 })
             });
+
+            // If successful, start the 10-second timeout to re-enable the checkbox
+            setTimeout(() => {
+                consumedToday.delete(rowIndex);
+                renderMealList(); // Re-render the list to show the updated, enabled item
+            }, 10000); // 10 seconds
+
         } catch (err) {
             console.error("Error decrementing quantity:", err);
             alert("Could not update meal count. Please refresh.");
+            // If the backend fails, immediately revert the UI changes
             consumedToday.delete(rowIndex);
             if (meal) meal.remaining++;
             renderMealList();
