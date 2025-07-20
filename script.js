@@ -6,39 +6,42 @@ window.onload = () => {
     const mealListEl = document.getElementById('meal-list');
     const loadingSpinner = document.getElementById('loading-spinner');
     const importEmailButton = document.getElementById('import-email-button');
+    const importTabButton = document.getElementById('import-tab-button');
     const iosTabs = document.getElementById('ios-tabs');
     const uploadTabContent = document.getElementById('Upload');
 
     // --- APP STATE ---
     let meals = [];
     const consumedToday = new Set();
-    let autoRefreshTimer; // Timer for the 6-hour auto-refresh
+    let autoRefreshTimer;
 
     // --- INITIALIZATION ---
     detectOS();
     loadMealsFromSheet();
 
     // --- AUTO-REFRESH LOGIC ---
-    /**
-     * Resets the 6-hour timer that automatically refreshes the meal list.
-     * This is called on page load and after every user interaction.
-     */
     function resetAutoRefreshTimer() {
-        clearTimeout(autoRefreshTimer); // Clear any existing timer
+        clearTimeout(autoRefreshTimer);
         const sixHoursInMillis = 6 * 60 * 60 * 1000;
         autoRefreshTimer = setTimeout(loadMealsFromSheet, sixHoursInMillis);
     }
 
     // --- OS DETECTION & UI SETUP ---
+    /**
+     * MODIFIED: Hides import functionality on Android, shows tabs on iOS/Desktop.
+     */
     function detectOS() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            iosTabs.classList.remove('hidden');
-            uploadTabContent.classList.add('hidden');
-            document.getElementById('Upload').style.display = 'none';
-            document.getElementById('List').style.display = 'block';
+
+        if (/android/i.test(userAgent)) {
+            // On Android, hide the tabs and the import button's content area.
+            iosTabs.style.display = 'none';
+            uploadTabContent.style.display = 'none';
         } else {
-            uploadTabContent.classList.remove('hidden');
+            // On other devices (iOS, Desktop), show the tab bar.
+            iosTabs.classList.remove('hidden');
+            document.getElementById('List').style.display = 'block';
+            document.getElementById('Upload').style.display = 'none';
         }
     }
 
@@ -55,7 +58,7 @@ window.onload = () => {
             alert("Could not load meals from the backend.");
         } finally {
             setLoading(false);
-            resetAutoRefreshTimer(); // Start the 6-hour timer after the list loads
+            resetAutoRefreshTimer();
         }
     }
 
@@ -89,22 +92,15 @@ window.onload = () => {
         updateMealCounter(availableMeals.length);
     }
 
-    /**
-     * Handles consuming a meal, with a 10-second timeout
-     * to re-enable the checkbox. Also resets the auto-refresh timer.
-     */
     async function consumeOneMeal(rowIndex) {
-        // Immediately update the UI to show the meal as consumed
         consumedToday.add(rowIndex);
         const meal = meals.find(m => m.row === rowIndex);
         if (meal) meal.remaining--;
         renderMealList();
 
-        // Reset the 6-hour refresh timer on user interaction
         resetAutoRefreshTimer();
 
         try {
-            // Send the update to the Google Sheet
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -114,16 +110,14 @@ window.onload = () => {
                 })
             });
 
-            // If successful, start the 10-second timeout to re-enable the checkbox
             setTimeout(() => {
                 consumedToday.delete(rowIndex);
-                renderMealList(); // Re-render the list to show the updated, enabled item
-            }, 10000); // 10 seconds
+                renderMealList();
+            }, 10000);
 
         } catch (err) {
             console.error("Error decrementing quantity:", err);
             alert("Could not update meal count. Please refresh.");
-            // If the backend fails, immediately revert the UI changes
             consumedToday.delete(rowIndex);
             if (meal) meal.remaining++;
             renderMealList();
@@ -147,7 +141,7 @@ window.onload = () => {
             const result = await response.json();
             alert(result.message);
             if (result.status === 'success') {
-                await loadMealsFromSheet(); // Refresh the list
+                await loadMealsFromSheet();
             }
         } catch (err) {
             console.error("Error triggering email import:", err);
