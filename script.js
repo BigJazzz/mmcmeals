@@ -6,14 +6,30 @@ window.onload = () => {
     const mealListEl = document.getElementById('meal-list');
     const loadingSpinner = document.getElementById('loading-spinner');
     const importEmailButton = document.getElementById('import-email-button');
-    // Keep other elements if you still use them (PDF upload, tabs, etc.)
+    const iosTabs = document.getElementById('ios-tabs');
+    const uploadTabContent = document.getElementById('Upload');
 
     // --- APP STATE ---
     let meals = [];
     const consumedToday = new Set(); // Track meals consumed in this session
 
     // --- INITIALIZATION ---
+    detectOS();
     loadMealsFromSheet();
+
+    // --- OS DETECTION & UI SETUP ---
+    function detectOS() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            iosTabs.classList.remove('hidden');
+            uploadTabContent.classList.add('hidden');
+            document.getElementById('Upload').style.display = 'none';
+            document.getElementById('List').style.display = 'block';
+        } else {
+            // For Android/Desktop, show the import button by default
+            uploadTabContent.classList.remove('hidden');
+        }
+    }
 
     // --- DATA & UI FUNCTIONS ---
     async function loadMealsFromSheet() {
@@ -62,13 +78,11 @@ window.onload = () => {
     }
 
     async function consumeOneMeal(rowIndex) {
-        // Optimistically update UI
         consumedToday.add(rowIndex);
         const meal = meals.find(m => m.row === rowIndex);
         if (meal) meal.remaining--;
         renderMealList();
 
-        // Send update to the backend
         try {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -81,7 +95,6 @@ window.onload = () => {
         } catch (err) {
             console.error("Error decrementing quantity:", err);
             alert("Could not update meal count. Please refresh.");
-            // Revert optimistic update on failure
             consumedToday.delete(rowIndex);
             if (meal) meal.remaining++;
             renderMealList();
@@ -119,4 +132,18 @@ window.onload = () => {
         loadingSpinner.style.display = isLoading ? 'block' : 'none';
         mealListEl.style.display = isLoading ? 'none' : 'grid';
     }
+    
+    // --- TAB SWITCHING LOGIC ---
+    window.openTab = (evt, tabName) => {
+        const tabcontent = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        const tablinks = document.getElementsByClassName("tab-link");
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    };
 };
