@@ -162,3 +162,9 @@ button, input[type="file"] {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.meal-qty {
+    color: #888;
+    font-size: 0.9em;
+    margin-left: 8px;
+}
