@@ -8,42 +8,42 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-
     <header>
         <h1>Meal Tracker</h1>
         <div id="meal-counter">--</div>
     </header>
-
     <main>
         <div id="ios-tabs" class="tabs hidden">
             <button class="tab-link active" onclick="openTab(event, 'List')">Meal List</button>
+            <button class="tab-link" onclick="openTab(event, 'Assign')">Assign</button>
             <button id="import-tab-button" class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
         </div>
 
         <div id="List" class="tab-content">
-            <div id="meal-list-container">
-                <ul id="meal-list">
-                    </ul>
-            </div>
+            <ul id="meal-list"></ul>
             <div id="loading-spinner" class="spinner" style="display: none;"></div>
+        </div>
+
+        <div id="Assign" class="tab-content hidden">
+            <div id="assignment-list-container">
+                <p>Assign meals with a total quantity greater than 1.</p>
+                <ul id="assignment-list"></ul>
+                <button id="save-assignments-button">Save Assignments</button>
+            </div>
         </div>
 
         <div id="Upload" class="tab-content hidden">
             <div class="upload-area">
-                <p>Import the latest order directly from your Gmail.</p>
+                <p>Import the latest order from Gmail.</p>
                 <button id="import-email-button">Import from Email</button>
             </div>
         </div>
     </main>
-
     <div id="undo-banner" class="hidden">
         <span id="undo-message">Consumed 1 meal</span>
         <button id="undo-button">Undo</button>
-        <div class="progress-bar">
-            <div id="progress-bar-inner"></div>
-        </div>
+        <div class="progress-bar"><div id="progress-bar-inner"></div></div>
     </div>
-
-    <script src="script.js?v=1.4"></script>
+    <script src="script.js?v=1.5"></script>
 </body>
 </html>
