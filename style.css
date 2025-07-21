@@ -6,7 +6,6 @@
     --protein-pork-color: #f5c6cb;
     --protein-fish-color: #f1efd1;
     --protein-vegetarian-color: #d4edda;
-
     /* Base styles */
     --primary-color: #4a90e2;
     --background-color: #f4f4f9;
@@ -15,8 +14,7 @@
     --card-bg: #ffffff;
     --shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-
-/* Single-color rules use the variables for the script to read */
+/* Single-color rules */
 .meal-item.protein-beef { background-color: var(--protein-beef-color); }
 .meal-item.protein-chicken { background-color: var(--protein-chicken-color); }
 .meal-item.protein-lamb { background-color: var(--protein-lamb-color); }
@@ -24,9 +22,73 @@
 .meal-item.protein-fish { background-color: var(--protein-fish-color); }
 .meal-item.protein-vegetarian { background-color: var(--protein-vegetarian-color); }
 
-/* NOTE: All manual dual-color rules have been removed as requested. */
+/* --- NEW: Protein Group Header Styles --- */
+.protein-group-header {
+    grid-column: 1 / -1; /* Span all columns */
+    margin-top: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ccc;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+.protein-group-header:first-child {
+    margin-top: 0; /* Remove margin from the very first header */
+}
 
-/* --- Layout for Meal Name and Quantity --- */
+/* --- NEW: Undo Banner Styles --- */
+#undo-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    pointer-events: none;
+}
+#undo-banner.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+#undo-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background-color: #555;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+#progress-bar-inner {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 100%;
+    transition: width 5s linear;
+}
+#undo-banner.visible #progress-bar-inner {
+    width: 0%;
+}
+
+
+/* --- Layout and other styles --- */
 .meal-item label {
     display: flex;
     flex-direction: column;
@@ -44,7 +106,6 @@
     color: #555;
     margin-top: 4px;
 }
-/* --- Other existing styles --- */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--background-color);
@@ -53,17 +114,16 @@ body {
     padding: 1rem;
     -webkit-tap-highlight-color: transparent;
 }
+header, main {
+    padding: 0 1rem;
+}
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
     margin-bottom: 1rem;
 }
-h1 {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-}
+h1 { color: var(--primary-color); font-size: 1.8rem; }
 #meal-counter {
     font-size: 1.5rem;
     font-weight: bold;
@@ -74,12 +134,7 @@ h1 {
     min-width: 40px;
     text-align: center;
 }
-#meal-counter.alert {
-    background-color: var(--red-alert);
-}
-main {
-    padding: 0 1rem;
-}
+#meal-counter.alert { background-color: var(--red-alert); }
 .tabs {
     overflow: hidden;
     border-bottom: 1px solid #ccc;
@@ -94,13 +149,9 @@ main {
     transition: 0.3s;
     font-size: 1rem;
 }
-.tab-link.active {
-    border-bottom: 3px solid var(--primary-color);
-    font-weight: bold;
-}
-.tab-content {
-    display: block;
-}
+.tab-link.active { border-bottom: 3px solid var(--primary-color); font-weight: bold; }
+.tab-content { display: block; }
+.hidden { display: none; }
 #meal-list {
     list-style: none;
     padding: 0;
@@ -108,11 +159,7 @@ main {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
-@media (min-width: 768px) {
-    #meal-list {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
+@media (min-width: 768px) { #meal-list { grid-template-columns: repeat(4, 1fr); } }
 .meal-item {
     padding: 1rem;
     border-radius: 8px;
@@ -122,18 +169,14 @@ main {
     gap: 0.8rem;
     transition: transform 0.2s;
 }
-.meal-item:active {
-    transform: scale(0.96);
-}
+.meal-item:active { transform: scale(0.96); }
 .meal-item input[type="checkbox"] {
     width: 22px;
     height: 22px;
     cursor: pointer;
     flex-shrink: 0;
 }
-.meal-item input[type="checkbox"]:checked + label {
-    opacity: 0.6;
-}
+.meal-item input[type="checkbox"]:checked + label { opacity: 0.6; }
 .upload-area {
     text-align: center;
     padding: 2rem;
@@ -146,9 +189,6 @@ button {
     border-radius: 8px;
     border: none;
     cursor: pointer;
-}
-.hidden {
-    display: none;
 }
 .spinner {
     border: 6px solid #f3f3f3;

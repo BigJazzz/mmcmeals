@@ -28,7 +28,7 @@
             <div id="loading-spinner" class="spinner" style="display: none;"></div>
         </div>
 
-        <div id="Upload" class="tab-content">
+        <div id="Upload" class="tab-content hidden">
             <div class="upload-area">
                 <p>Import the latest order directly from your Gmail.</p>
                 <button id="import-email-button">Import from Email</button>
@@ -36,6 +36,14 @@
         </div>
     </main>
 
-    <script src="script.js?v=1"></script>
+    <div id="undo-banner" class="hidden">
+        <span id="undo-message">Consumed 1 meal</span>
+        <button id="undo-button">Undo</button>
+        <div class="progress-bar">
+            <div id="progress-bar-inner"></div>
+        </div>
+    </div>
+
+    <script src="script.js?v=1.4"></script>
 </body>
 </html>
