@@ -1,4 +1,13 @@
 :root {
+    /* Colors are defined as CSS variables */
+    --protein-beef-color: #e3baa8;
+    --protein-chicken-color: #cde3ff;
+    --protein-lamb-color: #e9d8f3;
+    --protein-pork-color: #f5c6cb;
+    --protein-fish-color: #f1efd1;
+    --protein-other-color: #d4edda;
+
+    /* Base styles */
     --primary-color: #4a90e2;
     --background-color: #f4f4f9;
     --text-color: #333;
@@ -7,6 +16,33 @@
     --shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+/* Single-color rules still use the variables */
+.meal-item.protein-beef { background-color: var(--protein-beef-color); }
+.meal-item.protein-chicken { background-color: var(--protein-chicken-color); }
+.meal-item.protein-lamb { background-color: var(--protein-lamb-color); }
+.meal-item.protein-pork { background-color: var(--protein-pork-color); }
+.meal-item.protein-fish { background-color: var(--protein-fish-color); }
+.meal-item.protein-other { background-color: var(--protein-other-color); }
+
+/* NOTE: All manual dual-color rules have been removed. */
+
+/* --- Layout and other styles remain the same --- */
+.meal-item label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+}
+.meal-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-break: anywhere;
+}
+.meal-qty {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 4px;
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--background-color);
@@ -15,7 +51,6 @@ body {
     padding: 1rem;
     -webkit-tap-highlight-color: transparent;
 }
-
 header {
     display: flex;
     justify-content: space-between;
@@ -23,12 +58,10 @@ header {
     padding: 0 1rem;
     margin-bottom: 1rem;
 }
-
 h1 {
     color: var(--primary-color);
     font-size: 1.8rem;
 }
-
 #meal-counter {
     font-size: 1.5rem;
     font-weight: bold;
@@ -39,22 +72,17 @@ h1 {
     min-width: 40px;
     text-align: center;
 }
-
 #meal-counter.alert {
     background-color: var(--red-alert);
 }
-
 main {
     padding: 0 1rem;
 }
-
-/* Tabs for iOS */
 .tabs {
     overflow: hidden;
     border-bottom: 1px solid #ccc;
     margin-bottom: 1rem;
 }
-
 .tab-link {
     background-color: inherit;
     border: none;
@@ -64,34 +92,26 @@ main {
     transition: 0.3s;
     font-size: 1rem;
 }
-
 .tab-link.active {
     border-bottom: 3px solid var(--primary-color);
     font-weight: bold;
 }
-
 .tab-content {
-    display: block; /* Default state */
+    display: block;
 }
-
-/* Meal List */
 #meal-list {
     list-style: none;
     padding: 0;
     display: grid;
-    /* Responsive columns: 2 for small screens, 4 for tablets and up */
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
-
 @media (min-width: 768px) {
     #meal-list {
         grid-template-columns: repeat(4, 1fr);
     }
 }
-
 .meal-item {
-    background-color: var(--card-bg);
     padding: 1rem;
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -100,54 +120,34 @@ main {
     gap: 0.8rem;
     transition: transform 0.2s;
 }
-
 .meal-item:active {
     transform: scale(0.96);
 }
-
 .meal-item input[type="checkbox"] {
     width: 22px;
     height: 22px;
     cursor: pointer;
+    flex-shrink: 0;
 }
-
-.meal-item label {
-    flex-grow: 1;
-    font-size: 1.1rem;
-    line-break: anywhere;
-}
-
 .meal-item input[type="checkbox"]:checked + label {
-    text-decoration: line-through;
     opacity: 0.6;
 }
-
-/* Upload & Auth */
-.upload-area, #auth-container {
+.upload-area {
     text-align: center;
     padding: 2rem;
     border: 2px dashed #ccc;
     border-radius: 10px;
 }
-
-button, input[type="file"] {
+button {
     font-size: 1rem;
     padding: 0.8rem 1.2rem;
     border-radius: 8px;
     border: none;
     cursor: pointer;
 }
-
-#authorize_button {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-/* Utility */
 .hidden {
-    display: none !important;
+    display: none;
 }
-
 .spinner {
     border: 6px solid #f3f3f3;
     border-top: 6px solid var(--primary-color);
@@ -157,46 +157,7 @@ button, input[type="file"] {
     animation: spin 1s linear infinite;
     margin: 2rem auto;
 }
-
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-.meal-qty {
-    color: #888;
-    font-size: 0.9em;
-    margin-left: 8px;
-}
-
-/* Color-coding for different protein types */
-.meal-item.protein-beef { background-color: #f8d7da; } /* Light Red */
-.meal-item.protein-chicken { background-color: #fff3cd; } /* Light Yellow */
-.meal-item.protein-lamb { background-color: #e9d8f3; } /* Light Purple */
-.meal-item.protein-pork { background-color: #f5c6cb; } /* Light Pink */
-.meal-item.protein-fish { background-color: #d1ecf1; } /* Light Blue */
-.meal-item.protein-other { background-color: #d4edda; } /* Light Green */
-
-/* --- Layout for Meal Name and Quantity --- */
-
-/* Make the label a flex container that stacks items vertically */
-.meal-item label {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Align text to the left */
-    flex-grow: 1;
-}
-
-/* Style for the meal name */
-.meal-name {
-    font-size: 1.1rem;
-    font-weight: 500;
-    line-break: anywhere;
-}
-
-/* Style for the quantity, now on its own line */
-.meal-qty {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 4px; /* Adds a little space between name and quantity */
 }
