@@ -9,6 +9,7 @@ window.onload = () => {
     const importTabButton = document.getElementById('import-tab-button');
     const iosTabs = document.getElementById('ios-tabs');
     const uploadTabContent = document.getElementById('Upload');
+    const listTabContent = document.getElementById('List');
 
     // --- APP STATE ---
     let meals = [];
@@ -28,24 +29,47 @@ window.onload = () => {
 
     // --- OS DETECTION & UI SETUP ---
     /**
-     * MODIFIED: Hides import functionality on Android, shows tabs on iOS/Desktop.
+     * MODIFIED: This function now correctly handles the initial visibility
+     * of tabs for all devices.
      */
     function detectOS() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
         if (/android/i.test(userAgent)) {
-            // On Android, hide the tabs and the import button's content area.
+            // On Android, hide the tabs and the import functionality.
             iosTabs.style.display = 'none';
             uploadTabContent.style.display = 'none';
         } else {
-            // On other devices (iOS, Desktop), show the tab bar.
+            // On other devices (iOS, Desktop), show the tab bar and default to the List view.
             iosTabs.classList.remove('hidden');
-            document.getElementById('List').style.display = 'block';
-            document.getElementById('Upload').style.display = 'none';
+            listTabContent.classList.remove('hidden');
+            uploadTabContent.classList.add('hidden');
         }
     }
+    
+    // --- TAB SWITCHING LOGIC ---
+    /**
+     * MODIFIED: This function now uses CSS classes for a more robust show/hide mechanism.
+     */
+    window.openTab = (evt, tabName) => {
+        // Hide all tab content by adding the 'hidden' class
+        const tabcontent = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.add('hidden');
+        }
 
-    // --- DATA & UI FUNCTIONS ---
+        // Deactivate all tab links
+        const tablinks = document.getElementsByClassName("tab-link");
+        for (let i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab's content by removing the 'hidden' class and activate its button
+        document.getElementById(tabName).classList.remove('hidden');
+        evt.currentTarget.className += " active";
+    };
+
+    // --- DATA & UI FUNCTIONS --- (No changes below this line)
     async function loadMealsFromSheet() {
         setLoading(true);
         try {
@@ -155,18 +179,4 @@ window.onload = () => {
         loadingSpinner.style.display = isLoading ? 'block' : 'none';
         mealListEl.style.display = isLoading ? 'none' : 'grid';
     }
-    
-    // --- TAB SWITCHING LOGIC ---
-    window.openTab = (evt, tabName) => {
-        const tabcontent = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        const tablinks = document.getElementsByClassName("tab-link");
-        for (let i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " active";
-    };
 };
