@@ -6,7 +6,6 @@ window.onload = () => {
     const mealListEl = document.getElementById('meal-list');
     const loadingSpinner = document.getElementById('loading-spinner');
     const importEmailButton = document.getElementById('import-email-button');
-    const importTabButton = document.getElementById('import-tab-button');
     const iosTabs = document.getElementById('ios-tabs');
     const uploadTabContent = document.getElementById('Upload');
     const listTabContent = document.getElementById('List');
@@ -20,6 +19,23 @@ window.onload = () => {
     detectOS();
     loadMealsFromSheet();
 
+    // --- NEW: PROTEIN DETECTION ---
+    /**
+     * Determines a CSS class based on keywords in the meal name.
+     * Treats "Brisket" as "Beef".
+     * @param {string} mealName The name of the meal.
+     * @returns {string} The CSS class for the protein type.
+     */
+    function getProteinType(mealName) {
+        const lowerCaseName = mealName.toLowerCase();
+        if (lowerCaseName.includes('beef') || lowerCaseName.includes('brisket')) return 'protein-beef';
+        if (lowerCaseName.includes('chicken')) return 'protein-chicken';
+        if (lowerCaseName.includes('lamb')) return 'protein-lamb';
+        if (lowerCaseName.includes('pork')) return 'protein-pork';
+        if (lowerCaseName.includes('fish') || lowerCaseName.includes('salmon')) return 'protein-fish';
+        return 'protein-other'; // Default for vegetarian or other meals
+    }
+
     // --- AUTO-REFRESH LOGIC ---
     function resetAutoRefreshTimer() {
         clearTimeout(autoRefreshTimer);
@@ -28,19 +44,12 @@ window.onload = () => {
     }
 
     // --- OS DETECTION & UI SETUP ---
-    /**
-     * MODIFIED: This function now correctly handles the initial visibility
-     * of tabs for all devices.
-     */
     function detectOS() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
         if (/android/i.test(userAgent)) {
-            // On Android, hide the tabs and the import functionality.
             iosTabs.style.display = 'none';
             uploadTabContent.style.display = 'none';
         } else {
-            // On other devices (iOS, Desktop), show the tab bar and default to the List view.
             iosTabs.classList.remove('hidden');
             listTabContent.classList.remove('hidden');
             uploadTabContent.classList.add('hidden');
@@ -48,28 +57,20 @@ window.onload = () => {
     }
     
     // --- TAB SWITCHING LOGIC ---
-    /**
-     * MODIFIED: This function now uses CSS classes for a more robust show/hide mechanism.
-     */
     window.openTab = (evt, tabName) => {
-        // Hide all tab content by adding the 'hidden' class
         const tabcontent = document.getElementsByClassName("tab-content");
         for (let i = 0; i < tabcontent.length; i++) {
             tabcontent[i].classList.add('hidden');
         }
-
-        // Deactivate all tab links
         const tablinks = document.getElementsByClassName("tab-link");
         for (let i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
-
-        // Show the current tab's content by removing the 'hidden' class and activate its button
         document.getElementById(tabName).classList.remove('hidden');
         evt.currentTarget.className += " active";
     };
 
-    // --- DATA & UI FUNCTIONS --- (No changes below this line)
+    // --- DATA & UI FUNCTIONS ---
     async function loadMealsFromSheet() {
         setLoading(true);
         try {
@@ -86,6 +87,10 @@ window.onload = () => {
         }
     }
 
+    /**
+     * MODIFIED: Renders the meal list, applying protein colors
+     * and the new multi-line layout for the name and quantity.
+     */
     function renderMealList() {
         mealListEl.innerHTML = '';
         const availableMeals = meals.filter(m => m.remaining > 0);
@@ -95,13 +100,15 @@ window.onload = () => {
         } else {
             availableMeals.forEach(meal => {
                 const li = document.createElement('li');
-                li.className = 'meal-item';
+                // Add the protein class to the meal item
+                li.className = 'meal-item ' + getProteinType(meal.name);
                 const isConsumed = consumedToday.has(meal.row);
 
                 li.innerHTML = `
                     <input type="checkbox" id="meal-${meal.row}" ${isConsumed ? 'checked disabled' : ''}>
                     <label for="meal-${meal.row}">
-                        ${meal.name} <span class="meal-qty">(${meal.remaining}/${meal.original})</span>
+                        <span class="meal-name">${meal.name}</span>
+                        <span class="meal-qty">(${meal.remaining} of ${meal.original} left)</span>
                     </label>
                 `;
                 

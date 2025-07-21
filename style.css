@@ -168,3 +168,35 @@ button, input[type="file"] {
     font-size: 0.9em;
     margin-left: 8px;
 }
+
+/* Color-coding for different protein types */
+.meal-item.protein-beef { background-color: #f8d7da; } /* Light Red */
+.meal-item.protein-chicken { background-color: #fff3cd; } /* Light Yellow */
+.meal-item.protein-lamb { background-color: #e9d8f3; } /* Light Purple */
+.meal-item.protein-pork { background-color: #f5c6cb; } /* Light Pink */
+.meal-item.protein-fish { background-color: #d1ecf1; } /* Light Blue */
+.meal-item.protein-other { background-color: #d4edda; } /* Light Green */
+
+/* --- Layout for Meal Name and Quantity --- */
+
+/* Make the label a flex container that stacks items vertically */
+.meal-item label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align text to the left */
+    flex-grow: 1;
+}
+
+/* Style for the meal name */
+.meal-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-break: anywhere;
+}
+
+/* Style for the quantity, now on its own line */
+.meal-qty {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 4px; /* Adds a little space between name and quantity */
+}
