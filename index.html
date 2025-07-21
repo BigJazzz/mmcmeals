@@ -10,7 +10,11 @@
 <body>
     <header>
         <h1>Meal Tracker</h1>
-        <div id="meal-counter">--</div>
+        <div id="counter-container">
+            <div id="jarryd-counter">J --</div>
+            <div id="nathan-counter">N --</div>
+            <div id="meal-counter">--</div>
+        </div>
     </header>
     <main>
         <div id="ios-tabs" class="tabs hidden">
@@ -18,12 +22,10 @@
             <button class="tab-link" onclick="openTab(event, 'Assign')">Assign</button>
             <button id="import-tab-button" class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
         </div>
-
         <div id="List" class="tab-content">
             <ul id="meal-list"></ul>
             <div id="loading-spinner" class="spinner" style="display: none;"></div>
         </div>
-
         <div id="Assign" class="tab-content hidden">
             <div id="assignment-list-container">
                 <p>Assign meals with a total quantity greater than 1.</p>
@@ -31,7 +33,6 @@
                 <button id="save-assignments-button">Save Assignments</button>
             </div>
         </div>
-
         <div id="Upload" class="tab-content hidden">
             <div class="upload-area">
                 <p>Import the latest order from Gmail.</p>
@@ -44,6 +45,6 @@
         <button id="undo-button">Undo</button>
         <div class="progress-bar"><div id="progress-bar-inner"></div></div>
     </div>
-    <script src="script.js?v=1.5"></script>
+    <script src="script.js?v=1.6"></script>
 </body>
 </html>
