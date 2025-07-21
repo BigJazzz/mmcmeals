@@ -1,5 +1,5 @@
 :root {
-    /* Define colors as CSS variables */
+    /* Color variables */
     --protein-beef-color: #e3baa8;
     --protein-chicken-color: #cde3ff;
     --protein-lamb-color: #e9d8f3;
@@ -22,184 +22,83 @@
 .meal-item.protein-fish { background-color: var(--protein-fish-color); }
 .meal-item.protein-vegetarian { background-color: var(--protein-vegetarian-color); }
 
-/* --- NEW: Protein Group Header Styles --- */
-.protein-group-header {
-    grid-column: 1 / -1; /* Span all columns */
-    margin-top: 20px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #ccc;
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: var(--primary-color);
-}
-.protein-group-header:first-child {
-    margin-top: 0; /* Remove margin from the very first header */
-}
-
-/* --- NEW: Undo Banner Styles --- */
-#undo-banner {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 14px 20px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    pointer-events: none;
-}
-#undo-banner.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-#undo-button {
-    background: none;
-    border: none;
-    color: var(--primary-color);
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1rem;
-}
-.progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    width: 100%;
-    background-color: #555;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-#progress-bar-inner {
-    height: 100%;
-    background-color: var(--primary-color);
-    width: 100%;
-    transition: width 5s linear;
-}
-#undo-banner.visible #progress-bar-inner {
-    width: 0%;
-}
-
-
-/* --- Layout and other styles --- */
-.meal-item label {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    flex-grow: 1;
-}
-.meal-name {
-    font-size: 1.1rem;
-    font-weight: 500;
-    overflow-wrap: break-word; 
-    word-break: normal;
-}
-.meal-qty {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 4px;
-}
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 1rem;
-    -webkit-tap-highlight-color: transparent;
-}
-header, main {
-    padding: 0 1rem;
-}
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-h1 { color: var(--primary-color); font-size: 1.8rem; }
-#meal-counter {
-    font-size: 1.5rem;
-    font-weight: bold;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    min-width: 40px;
-    text-align: center;
-}
-#meal-counter.alert { background-color: var(--red-alert); }
-.tabs {
-    overflow: hidden;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 1rem;
-}
-.tab-link {
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 1rem;
-}
-.tab-link.active { border-bottom: 3px solid var(--primary-color); font-weight: bold; }
-.tab-content { display: block; }
-.hidden { display: none; }
+/* --- Two-Column Layout Styles --- */
 #meal-list {
     list-style: none;
     padding: 0;
     display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.protein-group-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.protein-group-header {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ccc;
+}
+.protein-meal-grid {
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
-@media (min-width: 768px) { #meal-list { grid-template-columns: repeat(4, 1fr); } }
-.meal-item {
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    transition: transform 0.2s;
+
+/* --- Assignment and Consumer Button Styles --- */
+.consumer-buttons { display: flex; gap: 8px; align-items: center; }
+.consumer-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.2); background-color: #fff;
+    font-weight: bold; font-size: 1rem; cursor: pointer;
+    display: flex; justify-content: center; align-items: center; padding: 0;
 }
+.assignment-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px; border-bottom: 1px solid #eee;
+}
+.assignment-inputs { display: flex; gap: 10px; align-items: center; }
+.assignment-inputs label { font-weight: bold; }
+.assignment-inputs input { width: 50px; padding: 5px; text-align: center; font-size: 1rem; }
+#save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; }
+#assignment-list-container p { text-align: center; margin-bottom: 1rem; color: #555; }
+
+/* --- Undo Banner Styles --- */
+#undo-banner {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background-color: #333; color: white; padding: 14px 20px;
+    border-radius: 8px; display: flex; align-items: center; gap: 15px;
+    z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    pointer-events: none;
+}
+#undo-banner.visible { opacity: 1; pointer-events: auto; }
+#undo-button { background: none; border: none; color: var(--primary-color); font-weight: bold; cursor: pointer; font-size: 1rem; }
+.progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; width: 100%; background-color: #555; border-radius: 0 0 8px 8px; }
+#progress-bar-inner { height: 100%; background-color: var(--primary-color); width: 100%; transition: width 5s linear; border-radius: 0 0 8px 8px;}
+#undo-banner.visible #progress-bar-inner { width: 0%; }
+
+/* --- General Layout and other styles --- */
+.meal-item label { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; }
+.meal-name { font-size: 1.1rem; font-weight: 500; overflow-wrap: break-word; word-break: normal; }
+.meal-qty { font-size: 0.9em; color: #555; margin-top: 4px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 1rem; -webkit-tap-highlight-color: transparent; }
+header, main { padding: 0 1rem; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+h1 { color: var(--primary-color); font-size: 1.8rem; }
+#meal-counter { font-size: 1.5rem; font-weight: bold; background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; border-radius: 8px; min-width: 40px; text-align: center; }
+#meal-counter.alert { background-color: var(--red-alert); }
+.tabs { overflow: hidden; border-bottom: 1px solid #ccc; margin-bottom: 1rem; }
+.tab-link { background-color: inherit; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 1rem; }
+.tab-link.active { border-bottom: 3px solid var(--primary-color); font-weight: bold; }
+.tab-content { display: block; }
+.hidden { display: none; }
+.meal-item { padding: 1rem; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 0.8rem; transition: transform 0.2s; }
 .meal-item:active { transform: scale(0.96); }
-.meal-item input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-.meal-item input[type="checkbox"]:checked + label { opacity: 0.6; }
-.upload-area {
-    text-align: center;
-    padding: 2rem;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-}
-button {
-    font-size: 1rem;
-    padding: 0.8rem 1.2rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-}
-.spinner {
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid var(--primary-color);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    margin: 2rem auto;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+.upload-area { text-align: center; padding: 2rem; border: 2px dashed #ccc; border-radius: 10px; }
+button { font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; }
+.spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 2rem auto; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
