@@ -1,11 +1,11 @@
 :root {
-    /* Colors are defined as CSS variables */
+    /* Define colors as CSS variables */
     --protein-beef-color: #e3baa8;
     --protein-chicken-color: #cde3ff;
     --protein-lamb-color: #e9d8f3;
     --protein-pork-color: #f5c6cb;
     --protein-fish-color: #f1efd1;
-    --protein-other-color: #d4edda;
+    --protein-vegetarian-color: #d4edda; /* MODIFIED */
 
     /* Base styles */
     --primary-color: #4a90e2;
@@ -16,17 +16,31 @@
     --shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Single-color rules still use the variables */
+/* Single-color rules now use the variables */
 .meal-item.protein-beef { background-color: var(--protein-beef-color); }
 .meal-item.protein-chicken { background-color: var(--protein-chicken-color); }
 .meal-item.protein-lamb { background-color: var(--protein-lamb-color); }
 .meal-item.protein-pork { background-color: var(--protein-pork-color); }
 .meal-item.protein-fish { background-color: var(--protein-fish-color); }
-.meal-item.protein-other { background-color: var(--protein-other-color); }
+.meal-item.protein-vegetarian { background-color: var(--protein-vegetarian-color); } /* MODIFIED */
 
-/* NOTE: All manual dual-color rules have been removed. */
+/* Dual-color rules for combinations */
+.meal-item.protein-chicken.protein-beef,
+.meal-item.protein-beef.protein-chicken {
+    background: linear-gradient(to right, var(--protein-chicken-color), var(--protein-beef-color));
+}
 
-/* --- Layout and other styles remain the same --- */
+.meal-item.protein-chicken.protein-pork,
+.meal-item.protein-pork.protein-chicken {
+    background: linear-gradient(to right, var(--protein-chicken-color), var(--protein-pork-color));
+}
+
+.meal-item.protein-beef.protein-pork,
+.meal-item.protein-pork.protein-beef {
+    background: linear-gradient(to right, var(--protein-beef-color), var(--protein-pork-color));
+}
+
+/* --- Layout and other styles --- */
 .meal-item label {
     display: flex;
     flex-direction: column;
