@@ -19,21 +19,19 @@ window.onload = () => {
     detectOS();
     loadMealsFromSheet();
 
-    // --- NEW: PROTEIN DETECTION ---
-    /**
-     * Determines a CSS class based on keywords in the meal name.
-     * Treats "Brisket" as "Beef".
-     * @param {string} mealName The name of the meal.
-     * @returns {string} The CSS class for the protein type.
-     */
-    function getProteinType(mealName) {
+    // --- MULTI-PROTEIN DETECTION ---
+    function getProteinTypes(mealName) {
         const lowerCaseName = mealName.toLowerCase();
-        if (lowerCaseName.includes('beef') || lowerCaseName.includes('brisket')) return 'protein-beef';
-        if (lowerCaseName.includes('chicken')) return 'protein-chicken';
-        if (lowerCaseName.includes('lamb')) return 'protein-lamb';
-        if (lowerCaseName.includes('pork')) return 'protein-pork';
-        if (lowerCaseName.includes('fish') || lowerCaseName.includes('salmon')) return 'protein-fish';
-        return 'protein-other'; // Default for vegetarian or other meals
+        const types = new Set();
+        if (lowerCaseName.includes('beef') || lowerCaseName.includes('brisket')) types.add('protein-beef');
+        if (lowerCaseName.includes('chicken')) types.add('protein-chicken');
+        if (lowerCaseName.includes('lamb')) types.add('protein-lamb');
+        if (lowerCaseName.includes('pork')) types.add('protein-pork');
+        if (lowerCaseName.includes('fish') || lowerCaseName.includes('salmon')) types.add('protein-fish');
+        if (types.size === 0) {
+            types.add('protein-other');
+        }
+        return Array.from(types);
     }
 
     // --- AUTO-REFRESH LOGIC ---
@@ -88,8 +86,8 @@ window.onload = () => {
     }
 
     /**
-     * MODIFIED: Renders the meal list, applying protein colors
-     * and the new multi-line layout for the name and quantity.
+     * MODIFIED: Auto-generates a gradient background if more than one
+     * protein type is detected in a meal's name.
      */
     function renderMealList() {
         mealListEl.innerHTML = '';
@@ -100,8 +98,28 @@ window.onload = () => {
         } else {
             availableMeals.forEach(meal => {
                 const li = document.createElement('li');
-                // Add the protein class to the meal item
-                li.className = 'meal-item ' + getProteinType(meal.name);
+                li.className = 'meal-item'; // Start with the base class
+
+                const proteinClasses = getProteinTypes(meal.name);
+
+                if (proteinClasses.length === 1) {
+                    // If only one protein, add the class for the CSS to handle it.
+                    li.classList.add(proteinClasses[0]);
+                } else if (proteinClasses.length > 1) {
+                    // If multiple proteins, auto-generate a gradient background.
+                    const colorVar1 = `--${proteinClasses[0]}-color`;
+                    const colorVar2 = `--${proteinClasses[1]}-color`;
+
+                    const color1 = getComputedStyle(document.documentElement).getPropertyValue(colorVar1).trim();
+                    const color2 = getComputedStyle(document.documentElement).getPropertyValue(colorVar2).trim();
+                    
+                    if (color1 && color2) {
+                        li.style.background = `linear-gradient(to right, ${color1}, ${color2})`;
+                    } else {
+                        li.classList.add('protein-other'); // Fallback color
+                    }
+                }
+                
                 const isConsumed = consumedToday.has(meal.row);
 
                 li.innerHTML = `
@@ -128,7 +146,6 @@ window.onload = () => {
         const meal = meals.find(m => m.row === rowIndex);
         if (meal) meal.remaining--;
         renderMealList();
-
         resetAutoRefreshTimer();
 
         try {
@@ -140,12 +157,10 @@ window.onload = () => {
                     payload: { row: rowIndex }
                 })
             });
-
             setTimeout(() => {
                 consumedToday.delete(rowIndex);
                 renderMealList();
             }, 10000);
-
         } catch (err) {
             console.error("Error decrementing quantity:", err);
             alert("Could not update meal count. Please refresh.");
