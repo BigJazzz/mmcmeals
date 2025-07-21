@@ -6,6 +6,8 @@ window.onload = () => {
 
     // --- DOM ELEMENTS ---
     const mealCounterEl = document.getElementById('meal-counter');
+    const jarrydCounterEl = document.getElementById('jarryd-counter');
+    const nathanCounterEl = document.getElementById('nathan-counter');
     const mealListEl = document.getElementById('meal-list');
     const assignmentListEl = document.getElementById('assignment-list');
     const saveAssignmentsButton = document.getElementById('save-assignments-button');
@@ -246,7 +248,7 @@ window.onload = () => {
         
         if (availableMeals.length === 0) {
             mealListEl.innerHTML = '<p>No meals remaining. Time to import a new order!</p>';
-            updateMealCounter(0);
+            updateMealCounter([]);
             return;
         }
 
@@ -303,12 +305,19 @@ window.onload = () => {
         }
         mealListEl.appendChild(column1);
         mealListEl.appendChild(column2);
-        updateMealCounter(availableMeals.reduce((sum, m) => sum + m.jarryd + m.nathan, 0));
+        updateMealCounter(availableMeals);
     }
     
-    function updateMealCounter(count) {
-        mealCounterEl.textContent = count;
-        mealCounterEl.classList.toggle('alert', count <= 5);
+    function updateMealCounter(availableMeals) {
+        const jarrydTotal = availableMeals.reduce((sum, m) => sum + m.jarryd, 0);
+        const nathanTotal = availableMeals.reduce((sum, m) => sum + m.nathan, 0);
+        const grandTotal = jarrydTotal + nathanTotal;
+
+        jarrydCounterEl.textContent = `J ${jarrydTotal}`;
+        nathanCounterEl.textContent = `N ${nathanTotal}`;
+        mealCounterEl.textContent = grandTotal;
+
+        mealCounterEl.classList.toggle('alert', grandTotal <= 5);
     }
 
     importEmailButton.addEventListener('click', async () => {
