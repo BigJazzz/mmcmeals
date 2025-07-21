@@ -8,13 +8,13 @@
     --protein-vegetarian-color: #d4edda;
     /* Base styles */
     --primary-color: #4a90e2;
-    --background-color: #f4f499;
+    --background-color: #f4f4f9;
     --text-color: #333;
     --red-alert: #e74c3c;
     --card-bg: #ffffff;
     --shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-/* Protein background colors */
+/* Single-color rules */
 .meal-item.protein-beef { background-color: var(--protein-beef-color); }
 .meal-item.protein-chicken { background-color: var(--protein-chicken-color); }
 .meal-item.protein-lamb { background-color: var(--protein-lamb-color); }
@@ -22,12 +22,12 @@
 .meal-item.protein-fish { background-color: var(--protein-fish-color); }
 .meal-item.protein-vegetarian { background-color: var(--protein-vegetarian-color); }
 
-/* --- NEW: Counter Container and Individual Counter Styles --- */
+/* --- Counter Container and Individual Counter Styles --- */
 #counter-container {
     display: flex;
     gap: 8px;
 }
-.counter-box {
+#jarryd-counter, #nathan-counter, #meal-counter {
     font-size: 1.2rem;
     font-weight: bold;
     color: white;
@@ -49,4 +49,83 @@
     background-color: var(--red-alert);
 }
 
-/* ... rest of your CSS is unchanged ... */
+
+/* --- Two-Column Layout Styles --- */
+#meal-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.protein-group-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.protein-group-header {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ccc;
+}
+.protein-meal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* --- Assignment and Consumer Button Styles --- */
+.consumer-buttons { display: flex; gap: 8px; align-items: center; }
+.consumer-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.2); background-color: #fff;
+    font-weight: bold; font-size: 1rem; cursor: pointer;
+    display: flex; justify-content: center; align-items: center; padding: 0;
+}
+.assignment-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px; border-bottom: 1px solid #eee;
+}
+.assignment-inputs { display: flex; gap: 10px; align-items: center; }
+.assignment-inputs label { font-weight: bold; }
+.assignment-inputs input { width: 50px; padding: 5px; text-align: center; font-size: 1rem; }
+#save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; }
+#assignment-list-container p { text-align: center; margin-bottom: 1rem; color: #555; }
+.assignment-item.assigned-complete { opacity: 0.7; }
+
+/* --- Undo Banner Styles --- */
+#undo-banner {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background-color: #333; color: white; padding: 14px 20px;
+    border-radius: 8px; display: flex; align-items: center; gap: 15px;
+    z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    pointer-events: none;
+}
+#undo-banner.visible { opacity: 1; pointer-events: auto; }
+#undo-button { background: none; border: none; color: var(--primary-color); font-weight: bold; cursor: pointer; font-size: 1rem; }
+.progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; width: 100%; background-color: #555; border-radius: 0 0 8px 8px; }
+#progress-bar-inner { height: 100%; background-color: var(--primary-color); width: 100%; transition: width 5s linear; border-radius: 0 0 8px 8px;}
+#undo-banner.visible #progress-bar-inner { width: 0%; }
+
+/* --- General Layout and other styles --- */
+.meal-item label { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; }
+.meal-name { font-size: 1.1rem; font-weight: 500; overflow-wrap: break-word; word-break: normal; }
+.meal-qty { font-size: 0.9em; color: #555; margin-top: 4px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 1rem; -webkit-tap-highlight-color: transparent; }
+header, main { padding: 0 1rem; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+h1 { color: var(--primary-color); font-size: 1.8rem; }
+.tabs { overflow: hidden; border-bottom: 1px solid #ccc; margin-bottom: 1rem; }
+.tab-link { background-color: inherit; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 1rem; }
+.tab-link.active { border-bottom: 3px solid var(--primary-color); font-weight: bold; }
+.tab-content { display: block; }
+.hidden { display: none; }
+.meal-item { padding: 1rem; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 0.8rem; transition: transform 0.2s; }
+.meal-item:active { transform: scale(0.96); }
+.upload-area { text-align: center; padding: 2rem; border: 2px dashed #ccc; border-radius: 10px; }
+button { font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; }
+.spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 2rem auto; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
