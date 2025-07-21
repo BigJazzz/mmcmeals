@@ -242,7 +242,6 @@ window.onload = () => {
     
     function renderMealList() {
         mealListEl.innerHTML = '';
-        // THIS IS THE FIX: Check the sum of jarryd and nathan quantities
         const availableMeals = meals.filter(m => (m.jarryd + m.nathan) > 0);
         
         if (availableMeals.length === 0) {
@@ -304,7 +303,6 @@ window.onload = () => {
         }
         mealListEl.appendChild(column1);
         mealListEl.appendChild(column2);
-        // FIX for the counter as well
         updateMealCounter(availableMeals.reduce((sum, m) => sum + m.jarryd + m.nathan, 0));
     }
     
