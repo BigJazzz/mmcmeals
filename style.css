@@ -77,7 +77,13 @@
 }
 
 /* --- Assignment and Consumer Button Styles --- */
-.consumer-buttons { display: flex; gap: 8px; align-items: center; }
+.consumer-buttons {
+    display: flex;
+    flex-direction: column; /* This is the key change */
+    gap: 8px;
+    align-items: center;
+}
+
 .consumer-btn {
     width: 38px; /* Increased from 30px */
     height: 38px; /* Increased from 30px */
