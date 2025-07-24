@@ -108,15 +108,15 @@ button { font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; border: no
 .spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 2rem auto; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* --- Mobile Responsive Styles --- */
+/* --- NEW: Mobile Responsive Styles --- */
 @media (max-width: 767px) {
-    /* MODIFIED: Adjusts header items for better wrapping */
+    /* Adjusts header items for better wrapping */
     header > h1 {
         flex-basis: 100%; /* Title takes full width on its own line */
     }
     #counter-container {
         flex-basis: 100%; /* Counter container takes full width on the next line */
-        justify-content: flex-end; /* Aligns counters to the right */
+        justify-content: flex-start; /* MODIFIED: Aligns counters to the left */
         margin-top: 10px;
     }
     main { padding: 0; }
