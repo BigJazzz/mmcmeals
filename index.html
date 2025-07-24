@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Meal Order Tracker</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <script>
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'style.css?t=' + Date.now();
+        document.head.appendChild(css);
+    </script>
 </head>
 <body>
     <header>
@@ -22,10 +28,12 @@
             <button class="tab-link" onclick="openTab(event, 'Assign')">Assign</button>
             <button id="import-tab-button" class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
         </div>
+
         <div id="List" class="tab-content">
             <ul id="meal-list"></ul>
             <div id="loading-spinner" class="spinner" style="display: none;"></div>
         </div>
+
         <div id="Assign" class="tab-content hidden">
             <div id="assignment-list-container">
                 <p>Assign meals with a total quantity greater than 1.</p>
@@ -33,6 +41,7 @@
                 <button id="save-assignments-button">Save Assignments</button>
             </div>
         </div>
+
         <div id="Upload" class="tab-content hidden">
             <div class="upload-area">
                 <p>Import the latest order from Gmail.</p>
@@ -45,6 +54,11 @@
         <button id="undo-button">Undo</button>
         <div class="progress-bar"><div id="progress-bar-inner"></div></div>
     </div>
-    <script src="script.js?v=1.6"></script>
+    
+    <script>
+        var script = document.createElement('script');
+        script.src = 'script.js?t=' + Date.now();
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>
