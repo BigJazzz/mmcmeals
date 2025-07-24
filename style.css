@@ -28,10 +28,9 @@
     font-size: 1.2rem; font-weight: bold; color: white;
     padding: 0.5rem 1rem; border-radius: 8px;
     min-width: 50px; text-align: center;
-    cursor: pointer; /* NEW: Make counters look clickable */
+    cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 }
-/* NEW: Style for the active filter button */
 .filter-active {
     transform: scale(1.05);
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
@@ -56,10 +55,21 @@
     font-weight: bold; font-size: 1.2rem; cursor: pointer;
     display: flex; justify-content: center; align-items: center; padding: 0;
 }
-.assignment-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+.assignment-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+}
+/* NEW: Alternating row colors */
+.assignment-item:nth-child(even) {
+    background-color: #f8f9fa;
+}
 .assignment-inputs { display: flex; gap: 10px; align-items: center; }
 .assignment-inputs label { font-weight: bold; }
 .assignment-inputs input { width: 50px; padding: 5px; text-align: center; font-size: 1rem; }
+.assignment-total { font-weight: bold; color: var(--primary-color); margin-left: 10px; }
 #save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; }
 #assignment-list-container p { text-align: center; margin-bottom: 1rem; color: #555; }
 .assignment-item.assigned-complete { opacity: 0.7; }
