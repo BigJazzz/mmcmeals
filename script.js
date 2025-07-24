@@ -25,29 +25,28 @@ window.onload = () => {
     let lastUpdateTimestamp = null;
     let undoTimer;
     let pendingActions = [];
-    let currentFilter = 'all'; // Track the active filter
+    let currentFilter = 'all';
+
+    // --- UTILITY ---
+    function debounce(func, delay = 300) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
 
     // --- INITIALIZATION ---
     detectOS();
     addFilterEventListeners();
     loadMealsAndStartChecker();
 
-    /**
-     * Adds click listeners to the counter buttons to set the filter.
-     */
     function addFilterEventListeners() {
-        jarrydCounterEl.addEventListener('click', () => {
-            currentFilter = (currentFilter === 'jarryd') ? 'all' : 'jarryd';
-            renderMealList();
-        });
-        nathanCounterEl.addEventListener('click', () => {
-            currentFilter = (currentFilter === 'nathan') ? 'all' : 'nathan';
-            renderMealList();
-        });
-        mealCounterEl.addEventListener('click', () => {
-            currentFilter = 'all';
-            renderMealList();
-        });
+        jarrydCounterEl.addEventListener('click', () => { currentFilter = (currentFilter === 'jarryd') ? 'all' : 'jarryd'; renderMealList(); });
+        nathanCounterEl.addEventListener('click', () => { currentFilter = (currentFilter === 'nathan') ? 'all' : 'nathan'; renderMealList(); });
+        mealCounterEl.addEventListener('click', () => { currentFilter = 'all'; renderMealList(); });
     }
 
     function getProteinTypes(mealName) {
@@ -66,7 +65,7 @@ window.onload = () => {
     function renderAssignmentList() {
         assignmentListEl.innerHTML = '';
         const mealsToAssign = meals.filter(m => m.total > 0);
-        const unassigned = mealsToAssign.filter(m => (m.jarryd + m.nathan) !== m.total);
+        const unassigned = mealsToAssign.filter(m => (m.jarryd + m.nathan) < m.total);
         const assigned = mealsToAssign.filter(m => (m.jarryd + m.nathan) === m.total);
 
         const createAssignmentItem = (meal, isComplete) => {
@@ -76,18 +75,19 @@ window.onload = () => {
             li.dataset.row = meal.row;
             li.dataset.total = meal.total;
             li.innerHTML = `
-                <span>${meal.name} (${meal.total})</span>
+                <span>${meal.name}</span>
                 <div class="assignment-inputs">
                     <label>J:</label> <input type="number" class="assign-jarryd" min="0" max="${meal.total}" value="${meal.jarryd}">
                     <label>N:</label> <input type="number" class="assign-nathan" min="0" max="${meal.total}" value="${meal.nathan}">
+                    <span class="assignment-total">/ ${meal.total}</span>
                 </div>`;
             return li;
         };
         unassigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, false)));
         assigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, true)));
     }
-
-    assignmentListEl.addEventListener('input', e => {
+    
+    const handleAssignmentInput = debounce(e => {
         if (e.target.matches('.assign-jarryd, .assign-nathan')) {
             const li = e.target.closest('.assignment-item');
             const total = parseInt(li.dataset.total, 10);
@@ -95,6 +95,7 @@ window.onload = () => {
             const nathanInput = li.querySelector('.assign-nathan');
             let jarrydVal = parseInt(jarrydInput.value, 10) || 0;
             let nathanVal = parseInt(nathanInput.value, 10) || 0;
+
             if (e.target.classList.contains('assign-jarryd')) {
                 if (jarrydVal > total) jarrydVal = total;
                 if (jarrydVal < 0) jarrydVal = 0;
@@ -106,18 +107,22 @@ window.onload = () => {
                 nathanInput.value = nathanVal;
                 jarrydInput.value = total - nathanVal;
             }
+
             const meal = meals.find(m => m.row == li.dataset.row);
             if(meal) {
                 meal.jarryd = parseInt(jarrydInput.value);
                 meal.nathan = parseInt(nathanInput.value);
             }
+
             if ((parseInt(jarrydInput.value) + parseInt(nathanInput.value)) === total) {
-                setTimeout(renderAssignmentList, 400);
+                renderAssignmentList();
             } else {
                 li.classList.remove('assigned-complete');
             }
         }
     });
+
+    assignmentListEl.addEventListener('input', handleAssignmentInput);
 
     saveAssignmentsButton.addEventListener('click', async () => {
         const payload = [];
@@ -159,8 +164,8 @@ window.onload = () => {
             const newButtons = document.createElement('div');
             newButtons.className = 'consumer-buttons';
             newButtons.innerHTML = `
-                ${meal.jarryd > 0 ? `<button class="consumer-btn consume-jarryd">J</button>` : ''}
-                ${meal.nathan > 0 ? `<button class="consumer-btn consume-nathan">N</button>` : ''}`;
+                ${meal.jarryd > 0 ? `<button class="consumer-btn consume-jarryd" data-person="jarryd">J</button>` : ''}
+                ${meal.nathan > 0 ? `<button class="consumer-btn consume-nathan" data-person="nathan">N</button>` : ''}`;
             oldButtons.replaceWith(newButtons);
             mealTile.querySelector('.consume-jarryd')?.addEventListener('click', () => consumeMeal(meal.row, 'jarryd'));
             mealTile.querySelector('.consume-nathan')?.addEventListener('click', () => consumeMeal(meal.row, 'nathan'));
