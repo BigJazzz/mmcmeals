@@ -25,10 +25,30 @@ window.onload = () => {
     let lastUpdateTimestamp = null;
     let undoTimer;
     let pendingActions = [];
+    let currentFilter = 'all'; // Track the active filter
 
     // --- INITIALIZATION ---
     detectOS();
+    addFilterEventListeners();
     loadMealsAndStartChecker();
+
+    /**
+     * Adds click listeners to the counter buttons to set the filter.
+     */
+    function addFilterEventListeners() {
+        jarrydCounterEl.addEventListener('click', () => {
+            currentFilter = (currentFilter === 'jarryd') ? 'all' : 'jarryd';
+            renderMealList();
+        });
+        nathanCounterEl.addEventListener('click', () => {
+            currentFilter = (currentFilter === 'nathan') ? 'all' : 'nathan';
+            renderMealList();
+        });
+        mealCounterEl.addEventListener('click', () => {
+            currentFilter = 'all';
+            renderMealList();
+        });
+    }
 
     function getProteinTypes(mealName) {
         const lowerCaseName = mealName.toLowerCase();
@@ -244,11 +264,19 @@ window.onload = () => {
     
     function renderMealList() {
         mealListEl.innerHTML = '';
-        const availableMeals = meals.filter(m => (m.jarryd + m.nathan) > 0);
+        
+        let filteredMeals = meals;
+        if (currentFilter === 'jarryd') {
+            filteredMeals = meals.filter(m => m.jarryd > 0);
+        } else if (currentFilter === 'nathan') {
+            filteredMeals = meals.filter(m => m.nathan > 0);
+        }
+        
+        const availableMeals = filteredMeals.filter(m => (m.jarryd + m.nathan) > 0);
         
         if (availableMeals.length === 0) {
-            mealListEl.innerHTML = '<p>No meals remaining. Time to import a new order!</p>';
-            updateMealCounter([]);
+            mealListEl.innerHTML = `<p>No meals found for the current filter.</p>`;
+            updateMealCounter(meals);
             return;
         }
 
@@ -305,12 +333,12 @@ window.onload = () => {
         }
         mealListEl.appendChild(column1);
         mealListEl.appendChild(column2);
-        updateMealCounter(availableMeals);
+        updateMealCounter(meals);
     }
     
-    function updateMealCounter(availableMeals) {
-        const jarrydTotal = availableMeals.reduce((sum, m) => sum + m.jarryd, 0);
-        const nathanTotal = availableMeals.reduce((sum, m) => sum + m.nathan, 0);
+    function updateMealCounter(mealList) {
+        const jarrydTotal = mealList.reduce((sum, m) => sum + m.jarryd, 0);
+        const nathanTotal = mealList.reduce((sum, m) => sum + m.nathan, 0);
         const grandTotal = jarrydTotal + nathanTotal;
 
         jarrydCounterEl.textContent = `J ${jarrydTotal}`;
@@ -318,6 +346,10 @@ window.onload = () => {
         mealCounterEl.textContent = grandTotal;
 
         mealCounterEl.classList.toggle('alert', grandTotal <= 5);
+
+        jarrydCounterEl.classList.toggle('filter-active', currentFilter === 'jarryd');
+        nathanCounterEl.classList.toggle('filter-active', currentFilter === 'nathan');
+        mealCounterEl.classList.toggle('filter-active', currentFilter === 'all');
     }
 
     importEmailButton.addEventListener('click', async () => {
