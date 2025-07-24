@@ -79,11 +79,20 @@
 /* --- Assignment and Consumer Button Styles --- */
 .consumer-buttons { display: flex; gap: 8px; align-items: center; }
 .consumer-btn {
-    width: 30px; height: 30px; border-radius: 50%;
-    border: 2px solid rgba(0,0,0,0.2); background-color: #fff;
-    font-weight: bold; font-size: 1rem; cursor: pointer;
-    display: flex; justify-content: center; align-items: center; padding: 0;
+    width: 38px; /* Increased from 30px */
+    height: 38px; /* Increased from 30px */
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,0.2); 
+    background-color: #fff;
+    font-weight: bold; 
+    font-size: 1.2rem; /* Increased from 1rem */
+    cursor: pointer;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 0;
 }
+
 .assignment-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px; border-bottom: 1px solid #eee;
