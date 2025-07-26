@@ -53,6 +53,16 @@
         <button id="undo-button">Undo</button>
         <div class="progress-bar"><div id="progress-bar-inner"></div></div>
     </div>
+    <div id="duplicate-modal" class="modal hidden">
+        <div class="modal-content">
+            <p id="modal-message">The newest unread email has already been imported. Do you want to import it again?</p>
+            <div class="modal-actions">
+              <button id="modal-continue" class="modal-btn">Yes</button>
+              <button id="modal-cancel" class="modal-btn cancel">No</button>
+            </div>
+        </div>
+    </div>
+
     
     <script>
         var script = document.createElement('script');
