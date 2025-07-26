@@ -27,17 +27,6 @@ window.onload = () => {
     let pendingActions = [];
     let currentFilter = 'all';
 
-    // --- UTILITY ---
-    function debounce(func, delay = 300) {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                func.apply(this, args);
-            }, delay);
-        };
-    }
-
     // --- INITIALIZATION ---
     detectOS();
     addFilterEventListeners();
@@ -87,7 +76,7 @@ window.onload = () => {
         assigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, true)));
     }
     
-    const handleAssignmentInput = debounce(e => {
+    const handleAssignmentInput = (e) => {
         if (e.target.matches('.assign-jarryd, .assign-nathan')) {
             const li = e.target.closest('.assignment-item');
             const total = parseInt(li.dataset.total, 10);
@@ -115,12 +104,12 @@ window.onload = () => {
             }
 
             if ((parseInt(jarrydInput.value) + parseInt(nathanInput.value)) === total) {
-                renderAssignmentList();
+                setTimeout(renderAssignmentList, 400);
             } else {
                 li.classList.remove('assigned-complete');
             }
         }
-    });
+    };
 
     assignmentListEl.addEventListener('input', handleAssignmentInput);
 
@@ -133,7 +122,10 @@ window.onload = () => {
                 nathan: li.querySelector('.assign-nathan').value
             });
         });
-        setLoading(true);
+
+        saveAssignmentsButton.disabled = true;
+        saveAssignmentsButton.textContent = 'Saving...';
+
         try {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -145,12 +137,15 @@ window.onload = () => {
         } catch (err) {
             alert('Error saving assignments.');
         } finally {
-            setLoading(false);
+            saveAssignmentsButton.disabled = false;
+            saveAssignmentsButton.textContent = 'Save Assignments';
         }
     });
     
     // --- Main Rendering and Data Logic ---
     function consumeMeal(rowIndex, person) {
+        if (pendingActions.length > 0) return;
+
         const meal = meals.find(m => m.row === rowIndex);
         if (!meal) return;
         const personQty = person.toLowerCase() === 'jarryd' ? meal.jarryd : meal.nathan;
@@ -158,6 +153,7 @@ window.onload = () => {
         if (person.toLowerCase() === 'jarryd') meal.jarryd--;
         else meal.nathan--;
         pendingActions.push({ action: 'decrementPersonQty', payload: { row: rowIndex, person: person.toLowerCase() } });
+        
         const mealTile = document.getElementById(`meal-tile-${rowIndex}`);
         if(mealTile) {
             const oldButtons = mealTile.querySelector('.consumer-buttons');
@@ -269,14 +265,9 @@ window.onload = () => {
     
     function renderMealList() {
         mealListEl.innerHTML = '';
-        
         let filteredMeals = meals;
-        if (currentFilter === 'jarryd') {
-            filteredMeals = meals.filter(m => m.jarryd > 0);
-        } else if (currentFilter === 'nathan') {
-            filteredMeals = meals.filter(m => m.nathan > 0);
-        }
-        
+        if (currentFilter === 'jarryd') filteredMeals = meals.filter(m => m.jarryd > 0);
+        else if (currentFilter === 'nathan') filteredMeals = meals.filter(m => m.nathan > 0);
         const availableMeals = filteredMeals.filter(m => (m.jarryd + m.nathan) > 0);
         
         if (availableMeals.length === 0) {
@@ -305,7 +296,6 @@ window.onload = () => {
                 groupContainer.appendChild(header);
                 const mealGrid = document.createElement('div');
                 mealGrid.className = 'protein-meal-grid';
-                
                 groups[groupName].forEach(meal => {
                     const li = document.createElement('li');
                     const proteinClasses = getProteinTypes(meal.name);
@@ -325,9 +315,7 @@ window.onload = () => {
                             <span class="meal-name">${meal.name}</span>
                             <span class="meal-qty">J: ${meal.jarryd}, N: ${meal.nathan}</span>
                         </label>`;
-                    li.querySelectorAll('.consumer-btn').forEach(btn => {
-                        btn.addEventListener('click', () => consumeMeal(meal.row, btn.dataset.person));
-                    });
+                    li.querySelectorAll('.consumer-btn').forEach(btn => btn.addEventListener('click', () => consumeMeal(meal.row, btn.dataset.person)));
                     mealGrid.appendChild(li);
                 });
                 groupContainer.appendChild(mealGrid);
@@ -345,28 +333,42 @@ window.onload = () => {
         const jarrydTotal = mealList.reduce((sum, m) => sum + m.jarryd, 0);
         const nathanTotal = mealList.reduce((sum, m) => sum + m.nathan, 0);
         const grandTotal = jarrydTotal + nathanTotal;
-
         jarrydCounterEl.textContent = `J ${jarrydTotal}`;
         nathanCounterEl.textContent = `N ${nathanTotal}`;
         mealCounterEl.textContent = grandTotal;
-
         mealCounterEl.classList.toggle('alert', grandTotal <= 5);
-
         jarrydCounterEl.classList.toggle('filter-active', currentFilter === 'jarryd');
         nathanCounterEl.classList.toggle('filter-active', currentFilter === 'nathan');
         mealCounterEl.classList.toggle('filter-active', currentFilter === 'all');
     }
 
     importEmailButton.addEventListener('click', async () => {
+        importEmailButton.disabled = true;
+        importEmailButton.textContent = 'Checking...';
         setLoading(true);
         try {
-            const response = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
-            const result = await response.json();
-            alert(result.message);
-            if (result.status === 'success') await refreshMealList();
+            const checkResponse = await fetch(`${SCRIPT_URL}?action=checkLastEmail`);
+            const checkResult = await checkResponse.json();
+            let proceed = false;
+            if (checkResult.status === 'confirmation_needed') {
+                if (confirm(checkResult.message)) proceed = true;
+            } else if (checkResult.status === 'no_new_email') {
+                alert('No new unread meal emails found.');
+            } else {
+                proceed = true;
+            }
+            if (proceed) {
+                importEmailButton.textContent = 'Importing...';
+                const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+                const importResult = await importResponse.json();
+                alert(importResult.message);
+                if (importResult.status === 'success') await refreshMealList();
+            }
         } catch (err) {
-            alert("A client-side error occurred while importing from email.");
+            alert("A client-side error occurred during the import process.");
         } finally {
+            importEmailButton.disabled = false;
+            importEmailButton.textContent = 'Import from Email';
             setLoading(false);
         }
     });
