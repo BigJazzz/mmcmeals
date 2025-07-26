@@ -360,23 +360,50 @@ window.onload = () => {
             const checkResult = await checkResponse.json();
     
             if (checkResult.status === 'confirmation_needed') {
-                const proceed = confirm(checkResult.message); // or use a custom modal
-                if (!proceed) return;
-            } else if (checkResult.status === 'no_new_email') {
+                showModal(checkResult.message, async () => {
+                    await importAndRefreshMeals();
+                });
+                return; // halt here until modal choice is made
+            }
+    
+            if (checkResult.status === 'no_new_email') {
                 alert("No new unread email found.");
                 return;
             }
     
-            const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
-            const importResult = await importResponse.json();
-            alert(importResult.message);
-            if (importResult.status === 'success') await refreshMealList();
+            await importAndRefreshMeals();
         } catch (err) {
             alert("A client-side error occurred while checking/importing email.");
         } finally {
             setLoading(false);
         }
     });
+    
+    async function importAndRefreshMeals() {
+        const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+        const importResult = await importResponse.json();
+        alert(importResult.message);
+        if (importResult.status === 'success') await refreshMealList();
+    }
+    
+    function showModal(message, onContinue) {
+        const modal = document.getElementById('duplicate-modal');
+        const messageEl = document.getElementById('modal-message');
+        const continueBtn = document.getElementById('modal-continue');
+        const cancelBtn = document.getElementById('modal-cancel');
+    
+        messageEl.textContent = message;
+        modal.classList.remove('hidden');
+    
+        const closeModal = () => modal.classList.add('hidden');
+    
+        continueBtn.onclick = () => {
+            closeModal();
+            if (typeof onContinue === 'function') onContinue();
+        };
+    
+        cancelBtn.onclick = () => closeModal();
+    }
 
     function setLoading(isLoading) {
         loadingSpinner.style.display = isLoading ? 'block' : 'none';
