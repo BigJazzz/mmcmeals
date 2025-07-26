@@ -356,12 +356,23 @@ window.onload = () => {
     importEmailButton.addEventListener('click', async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
-            const result = await response.json();
-            alert(result.message);
-            if (result.status === 'success') await refreshMealList();
+            const checkResponse = await fetch(`${SCRIPT_URL}?action=checkLastEmail`);
+            const checkResult = await checkResponse.json();
+    
+            if (checkResult.status === 'confirmation_needed') {
+                const proceed = confirm(checkResult.message); // or use a custom modal
+                if (!proceed) return;
+            } else if (checkResult.status === 'no_new_email') {
+                alert("No new unread email found.");
+                return;
+            }
+    
+            const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+            const importResult = await importResponse.json();
+            alert(importResult.message);
+            if (importResult.status === 'success') await refreshMealList();
         } catch (err) {
-            alert("A client-side error occurred while importing from email.");
+            alert("A client-side error occurred while checking/importing email.");
         } finally {
             setLoading(false);
         }
@@ -370,6 +381,11 @@ window.onload = () => {
     function setLoading(isLoading) {
         loadingSpinner.style.display = isLoading ? 'block' : 'none';
         mealListEl.style.display = isLoading ? 'none' : 'grid';
+    
+        document.querySelectorAll('button').forEach(btn => {
+            btn.disabled = isLoading;
+            btn.classList.toggle('disabled', isLoading); // optional for styling
+        });
     }
 
     function detectOS() {
