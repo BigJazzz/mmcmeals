@@ -356,20 +356,63 @@ window.onload = () => {
     importEmailButton.addEventListener('click', async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
-            const result = await response.json();
-            alert(result.message);
-            if (result.status === 'success') await refreshMealList();
+            const checkResponse = await fetch(`${SCRIPT_URL}?action=checkLastEmail`);
+            const checkResult = await checkResponse.json();
+    
+            if (checkResult.status === 'confirmation_needed') {
+                showModal(checkResult.message, async () => {
+                    await importAndRefreshMeals();
+                });
+                return; // halt here until modal choice is made
+            }
+    
+            if (checkResult.status === 'no_new_email') {
+                alert("No new unread email found.");
+                return;
+            }
+    
+            await importAndRefreshMeals();
         } catch (err) {
-            alert("A client-side error occurred while importing from email.");
+            alert("A client-side error occurred while checking/importing email.");
         } finally {
             setLoading(false);
         }
     });
+    
+    async function importAndRefreshMeals() {
+        const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+        const importResult = await importResponse.json();
+        alert(importResult.message);
+        if (importResult.status === 'success') await refreshMealList();
+    }
+    
+    function showModal(message, onContinue) {
+        const modal = document.getElementById('duplicate-modal');
+        const messageEl = document.getElementById('modal-message');
+        const continueBtn = document.getElementById('modal-continue');
+        const cancelBtn = document.getElementById('modal-cancel');
+    
+        messageEl.textContent = message;
+        modal.classList.remove('hidden');
+    
+        const closeModal = () => modal.classList.add('hidden');
+    
+        continueBtn.onclick = () => {
+            closeModal();
+            if (typeof onContinue === 'function') onContinue();
+        };
+    
+        cancelBtn.onclick = () => closeModal();
+    }
 
     function setLoading(isLoading) {
         loadingSpinner.style.display = isLoading ? 'block' : 'none';
         mealListEl.style.display = isLoading ? 'none' : 'grid';
+    
+        document.querySelectorAll('button').forEach(btn => {
+            btn.disabled = isLoading;
+            btn.classList.toggle('disabled', isLoading); // optional for styling
+        });
     }
 
     function detectOS() {
