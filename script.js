@@ -27,6 +27,20 @@ window.onload = () => {
     let pendingActions = [];
     let currentFilter = 'all';
 
+    // --- UTILITY ---
+    /**
+     * NEW: Debounce function to delay execution of a function.
+     */
+    function debounce(func, delay = 300) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
+
     // --- INITIALIZATION ---
     detectOS();
     addFilterEventListeners();
@@ -76,7 +90,10 @@ window.onload = () => {
         assigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, true)));
     }
     
-    const handleAssignmentInput = (e) => {
+    /**
+     * MODIFIED: Uses the debounce utility for smoother input handling.
+     */
+    const handleAssignmentInput = debounce(e => {
         if (e.target.matches('.assign-jarryd, .assign-nathan')) {
             const li = e.target.closest('.assignment-item');
             const total = parseInt(li.dataset.total, 10);
@@ -104,12 +121,12 @@ window.onload = () => {
             }
 
             if ((parseInt(jarrydInput.value) + parseInt(nathanInput.value)) === total) {
-                setTimeout(renderAssignmentList, 400);
+                renderAssignmentList();
             } else {
                 li.classList.remove('assigned-complete');
             }
         }
-    };
+    });
 
     assignmentListEl.addEventListener('input', handleAssignmentInput);
 
@@ -122,10 +139,7 @@ window.onload = () => {
                 nathan: li.querySelector('.assign-nathan').value
             });
         });
-
-        saveAssignmentsButton.disabled = true;
-        saveAssignmentsButton.textContent = 'Saving...';
-
+        setLoading(true);
         try {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -137,15 +151,13 @@ window.onload = () => {
         } catch (err) {
             alert('Error saving assignments.');
         } finally {
-            saveAssignmentsButton.disabled = false;
-            saveAssignmentsButton.textContent = 'Save Assignments';
+            setLoading(false);
         }
     });
     
     // --- Main Rendering and Data Logic ---
     function consumeMeal(rowIndex, person) {
         if (pendingActions.length > 0) return;
-
         const meal = meals.find(m => m.row === rowIndex);
         if (!meal) return;
         const personQty = person.toLowerCase() === 'jarryd' ? meal.jarryd : meal.nathan;
@@ -153,7 +165,6 @@ window.onload = () => {
         if (person.toLowerCase() === 'jarryd') meal.jarryd--;
         else meal.nathan--;
         pendingActions.push({ action: 'decrementPersonQty', payload: { row: rowIndex, person: person.toLowerCase() } });
-        
         const mealTile = document.getElementById(`meal-tile-${rowIndex}`);
         if(mealTile) {
             const oldButtons = mealTile.querySelector('.consumer-buttons');
@@ -343,32 +354,15 @@ window.onload = () => {
     }
 
     importEmailButton.addEventListener('click', async () => {
-        importEmailButton.disabled = true;
-        importEmailButton.textContent = 'Checking...';
         setLoading(true);
         try {
-            const checkResponse = await fetch(`${SCRIPT_URL}?action=checkLastEmail`);
-            const checkResult = await checkResponse.json();
-            let proceed = false;
-            if (checkResult.status === 'confirmation_needed') {
-                if (confirm(checkResult.message)) proceed = true;
-            } else if (checkResult.status === 'no_new_email') {
-                alert('No new unread meal emails found.');
-            } else {
-                proceed = true;
-            }
-            if (proceed) {
-                importEmailButton.textContent = 'Importing...';
-                const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
-                const importResult = await importResponse.json();
-                alert(importResult.message);
-                if (importResult.status === 'success') await refreshMealList();
-            }
+            const response = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+            const result = await response.json();
+            alert(result.message);
+            if (result.status === 'success') await refreshMealList();
         } catch (err) {
-            alert("A client-side error occurred during the import process.");
+            alert("A client-side error occurred while importing from email.");
         } finally {
-            importEmailButton.disabled = false;
-            importEmailButton.textContent = 'Import from Email';
             setLoading(false);
         }
     });
