@@ -122,3 +122,43 @@ button { font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; border: no
     main { padding: 0; }
     #meal-list { grid-template-columns: 1fr; }
 }
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal.hidden {
+  display: none;
+}
+.modal-content {
+  background: #fff;
+  padding: 2em;
+  border-radius: 8px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.modal-actions {
+  margin-top: 1em;
+  display: flex;
+  justify-content: space-around;
+}
+.modal-btn {
+  padding: 0.5em 1em;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+.modal-btn.cancel {
+  background: #ccc;
+}
+.modal-btn:not(.cancel) {
+  background: #28a745;
+  color: white;
+}
