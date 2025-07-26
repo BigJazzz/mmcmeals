@@ -28,6 +28,9 @@ window.onload = () => {
     let currentFilter = 'all';
 
     // --- UTILITY ---
+    /**
+     * NEW: Debounce function to delay execution of a function.
+     */
     function debounce(func, delay = 300) {
         let timeout;
         return (...args) => {
@@ -87,6 +90,9 @@ window.onload = () => {
         assigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, true)));
     }
     
+    /**
+     * MODIFIED: Uses the debounce utility for smoother input handling.
+     */
     const handleAssignmentInput = debounce(e => {
         if (e.target.matches('.assign-jarryd, .assign-nathan')) {
             const li = e.target.closest('.assignment-item');
@@ -151,6 +157,7 @@ window.onload = () => {
     
     // --- Main Rendering and Data Logic ---
     function consumeMeal(rowIndex, person) {
+        if (pendingActions.length > 0) return;
         const meal = meals.find(m => m.row === rowIndex);
         if (!meal) return;
         const personQty = person.toLowerCase() === 'jarryd' ? meal.jarryd : meal.nathan;
@@ -269,14 +276,9 @@ window.onload = () => {
     
     function renderMealList() {
         mealListEl.innerHTML = '';
-        
         let filteredMeals = meals;
-        if (currentFilter === 'jarryd') {
-            filteredMeals = meals.filter(m => m.jarryd > 0);
-        } else if (currentFilter === 'nathan') {
-            filteredMeals = meals.filter(m => m.nathan > 0);
-        }
-        
+        if (currentFilter === 'jarryd') filteredMeals = meals.filter(m => m.jarryd > 0);
+        else if (currentFilter === 'nathan') filteredMeals = meals.filter(m => m.nathan > 0);
         const availableMeals = filteredMeals.filter(m => (m.jarryd + m.nathan) > 0);
         
         if (availableMeals.length === 0) {
@@ -305,7 +307,6 @@ window.onload = () => {
                 groupContainer.appendChild(header);
                 const mealGrid = document.createElement('div');
                 mealGrid.className = 'protein-meal-grid';
-                
                 groups[groupName].forEach(meal => {
                     const li = document.createElement('li');
                     const proteinClasses = getProteinTypes(meal.name);
@@ -325,9 +326,7 @@ window.onload = () => {
                             <span class="meal-name">${meal.name}</span>
                             <span class="meal-qty">J: ${meal.jarryd}, N: ${meal.nathan}</span>
                         </label>`;
-                    li.querySelectorAll('.consumer-btn').forEach(btn => {
-                        btn.addEventListener('click', () => consumeMeal(meal.row, btn.dataset.person));
-                    });
+                    li.querySelectorAll('.consumer-btn').forEach(btn => btn.addEventListener('click', () => consumeMeal(meal.row, btn.dataset.person)));
                     mealGrid.appendChild(li);
                 });
                 groupContainer.appendChild(mealGrid);
@@ -345,13 +344,10 @@ window.onload = () => {
         const jarrydTotal = mealList.reduce((sum, m) => sum + m.jarryd, 0);
         const nathanTotal = mealList.reduce((sum, m) => sum + m.nathan, 0);
         const grandTotal = jarrydTotal + nathanTotal;
-
         jarrydCounterEl.textContent = `J ${jarrydTotal}`;
         nathanCounterEl.textContent = `N ${nathanTotal}`;
         mealCounterEl.textContent = grandTotal;
-
         mealCounterEl.classList.toggle('alert', grandTotal <= 5);
-
         jarrydCounterEl.classList.toggle('filter-active', currentFilter === 'jarryd');
         nathanCounterEl.classList.toggle('filter-active', currentFilter === 'nathan');
         mealCounterEl.classList.toggle('filter-active', currentFilter === 'all');
