@@ -1,0 +1,30 @@
+name: Sync Web Assets to Android
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Sync files to Android assets
+        run: |
+          ASSETS_DIR="MealTrackerApp/app/src/main/assets"
+          mkdir -p $ASSETS_DIR
+          cp index.html $ASSETS_DIR/
+          cp style.css $ASSETS_DIR/
+          cp script.js $ASSETS_DIR/
+          cp favicon.ico $ASSETS_DIR/
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add MealTrackerApp/app/src/main/assets/
+          git commit -m "Automated: Sync web assets" || echo "No changes to commit"
+          git push

@@ -1,10 +1,12 @@
 window.onload = () => {
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv4lTtqAyle1X5-inx5FUmUXoXpAMGVr0wVGpFZgus0IOB_MEDvV11JcQKa325RLbf/exec';
 
-    const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'bolognese': 'protein-beef', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
-    const PROTEIN_ORDER = [ 'protein-vegetarian', 'protein-lamb', 'protein-pork', 'protein-fish', 'protein-chicken', 'protein-beef' ];
+    const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
+    const PROTEIN_ORDER = [ 'protein-chicken', 'protein-beef', 'protein-lamb', 'protein-pork', 'protein-fish', 'protein-vegetarian' ];
 
     // --- DOM ELEMENTS ---
+    const blackoutScreen = document.getElementById('blackout-screen');
+    const blackoutButton = document.getElementById('blackout-button');
     const mealCounterEl = document.getElementById('meal-counter');
     const jarrydCounterEl = document.getElementById('jarryd-counter');
     const nathanCounterEl = document.getElementById('nathan-counter');
@@ -30,12 +32,28 @@ window.onload = () => {
     // --- INITIALIZATION ---
     detectOS();
     addFilterEventListeners();
+    setupBlackoutButton();
     loadMealsAndStartChecker();
 
-    // --- LOCAL CACHING ---
-    function saveAssignmentsToLocal() {
-        localStorage.setItem('pendingMealAssignments', JSON.stringify(meals));
+    // --- NEW: Blackout Logic ---
+    function setupBlackoutButton() {
+        // The "Android" object is injected by the WebView in your Android app
+        if (window.Android) {
+            blackoutButton.classList.remove('hidden');
+            blackoutButton.addEventListener('click', () => {
+                // Call the function defined in your Android app's MainActivity.kt
+                window.Android.toggleBlackout();
+            });
+        }
     }
+
+    // This function can be called FROM the Android app to toggle the blackout screen
+    function toggleBlackout(isBlackedOut) {
+        blackoutScreen.classList.toggle('hidden', !isBlackedOut);
+    }
+    // Make the function globally accessible for the Android app to call
+    window.toggleBlackout = toggleBlackout;
+
 
     function addFilterEventListeners() {
         jarrydCounterEl.addEventListener('click', () => { currentFilter = (currentFilter === 'jarryd') ? 'all' : 'jarryd'; renderMealList(); });
@@ -72,13 +90,15 @@ window.onload = () => {
 
             li.innerHTML = `
                 <span class="assignment-name">${meal.name}</span>
-                <div class="assignment-inputs">
-                    <label>J:</label> <input type="number" class="assign-jarryd" min="0" max="${meal.total}" value="${meal.jarryd}">
-                    <label>N:</label> <input type="number" class="assign-nathan" min="0" max="${meal.total}" value="${meal.nathan}">
-                </div>
-                <div class="assignment-counts">
-                    <div class="assignment-counts-unassigned">${unassignedQty}</div>
-                    <div class="assignment-counts-total">of ${meal.total}</div>
+                <div class="assignment-controls">
+                    <div class="assignment-counts">
+                        <span class="assignment-counts-unassigned">${unassignedQty}</span>
+                        <span class="assignment-counts-total"> of ${meal.total}</span>
+                    </div>
+                    <div class="assignment-inputs">
+                        <label>J:</label> <input type="number" class="assign-jarryd" min="0" max="${meal.total}" value="${meal.jarryd}">
+                        <label>N:</label> <input type="number" class="assign-nathan" min="0" max="${meal.total}" value="${meal.nathan}">
+                    </div>
                 </div>
                 <button class="save-line-button">Save</button>
             `;
