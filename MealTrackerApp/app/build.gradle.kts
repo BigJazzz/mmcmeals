@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.com.google.android.material)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.swiperefreshlayout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
