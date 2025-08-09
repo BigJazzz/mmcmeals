@@ -37,49 +37,14 @@
 #meal-counter { background-color: var(--primary-color); }
 #meal-counter.alert { background-color: var(--red-alert); }
 
+
 /* --- Two-Column Layout Styles --- */
 #meal-list { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .protein-group-container { display: flex; flex-direction: column; gap: 1rem; }
 .protein-group-header { font-size: 1.4rem; font-weight: bold; color: var(--primary-color); padding-bottom: 8px; border-bottom: 2px solid #ccc; }
 .protein-meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 
-/* --- MODIFIED: Assignment List Styles --- */
-#assignment-list {
-    list-style: none;
-    padding: 0; /* Fixes left-side gap */
-    margin: 0;
-}
-.assignment-item {
-    display: grid;
-    grid-template-columns: 1fr repeat(4, auto); /* 5 columns: Name, J, N, Counts, Save */
-    align-items: center;
-    gap: 15px;
-    padding: 12px 10px;
-    border-bottom: 1px solid #ddd;
-}
-.assignment-item:nth-child(even) { background-color: #f8f9fa; }
-.assignment-item.assigned-complete { opacity: 0.7; }
-
-.assignment-name { font-weight: 500; }
-.assignment-inputs { display: flex; gap: 10px; align-items: center; }
-.assignment-inputs label { font-weight: bold; }
-.assignment-inputs input { width: 45px; padding: 5px; text-align: center; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;}
-.assignment-counts { text-align: right; }
-.assignment-counts-unassigned { font-weight: bold; color: var(--primary-color); }
-.assignment-counts-total { color: #666; font-size: 0.9em; }
-.save-line-button {
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    background-color: #28a745;
-    color: white;
-}
-.save-line-button:disabled {
-    background-color: #aaa;
-}
-
-#save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; width: 100%; }
-
-/* --- Consumer Button Styles --- */
+/* --- Assignment and Consumer Button Styles --- */
 .consumer-buttons { display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .consumer-btn {
     width: 38px; height: 38px; border-radius: 50%;
@@ -89,21 +54,24 @@
 }
 .assignment-item {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto; /* Name, Controls, Save Button */
     align-items: center;
+    gap: 15px;
     padding: 12px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ddd;
 }
-.assignment-item:nth-child(even) {
-    background-color: #f8f9fa;
-}
+.assignment-item:nth-child(even) { background-color: #f8f9fa; }
+.assignment-item.assigned-complete { opacity: 0.7; }
+.assignment-name { font-weight: 500; }
+.assignment-controls { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.assignment-counts { display: flex; gap: 10px; font-size: 0.9em; color: #666; }
+.assignment-counts-unassigned { font-weight: bold; color: var(--primary-color); }
 .assignment-inputs { display: flex; gap: 10px; align-items: center; }
 .assignment-inputs label { font-weight: bold; }
-.assignment-inputs input { width: 50px; padding: 5px; text-align: center; font-size: 1rem; }
-.assignment-total { font-weight: bold; color: var(--primary-color); margin-left: 10px; }
-#save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; }
-#assignment-list-container p { text-align: center; margin-bottom: 1rem; color: #555; }
-.assignment-item.assigned-complete { opacity: 0.7; }
+.assignment-inputs input { width: 45px; padding: 5px; text-align: center; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;}
+.save-line-button { padding: 4px 8px; font-size: 0.8rem; background-color: #28a745; color: white; }
+#save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; width: 100%; }
+
 
 /* --- Undo Banner Styles --- */
 #undo-banner {
@@ -124,11 +92,9 @@
 .meal-item label { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; }
 .meal-name { font-size: 1.1rem; font-weight: 500; overflow-wrap: break-word; word-break: normal; }
 .meal-qty { font-size: 0.9em; color: #555; margin-top: 4px; }
-body {
-    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+body { font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 1rem; -webkit-tap-highlight-color: transparent; }
 header, main { padding: 0 1rem; }
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; /* MODIFIED: Allows wrapping */ }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
 h1 { color: var(--primary-color); font-size: 1.8rem; }
 .tabs { overflow: hidden; border-bottom: 1px solid #ccc; margin-bottom: 1rem; }
 .tab-link { background-color: inherit; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 1rem; }
@@ -138,21 +104,14 @@ h1 { color: var(--primary-color); font-size: 1.8rem; }
 .meal-item { padding: 1rem; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 0.8rem; transition: transform 0.2s; }
 .meal-item:active { transform: scale(0.96); }
 .upload-area { text-align: center; padding: 2rem; border: 2px dashed #ccc; border-radius: 10px; }
-button { font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; }
+button { font-family: "Montserrat", sans-serif; font-size: 1rem; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; }
 .spinner { border: 6px solid #f3f3f3; border-top: 6px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 2rem auto; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* --- NEW: Mobile Responsive Styles --- */
+/* --- Mobile Responsive Styles --- */
 @media (max-width: 767px) {
-    /* Adjusts header items for better wrapping */
-    header > h1 {
-        flex-basis: 100%; /* Title takes full width on its own line */
-    }
-    #counter-container {
-        flex-basis: 100%; /* Counter container takes full width on the next line */
-        justify-content: flex-start; /* MODIFIED: Aligns counters to the left */
-        margin-top: 10px;
-    }
+    header > h1 { flex-basis: 100%; }
+    #counter-container { flex-basis: 100%; justify-content: flex-start; margin-top: 10px; }
     main { padding: 0; }
     #meal-list { grid-template-columns: 1fr; }
 }
