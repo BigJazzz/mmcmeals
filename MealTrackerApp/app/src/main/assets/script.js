@@ -254,6 +254,7 @@ window.onload = () => {
             const response = await fetch(`${SCRIPT_URL}?action=getMeals`);
             if (!response.ok) throw new Error(`Network response was not ok`);
             let fetchedMeals = await response.json();
+            console.log("Data received from backend:", fetchedMeals); 
             const localData = localStorage.getItem('pendingMealAssignments');
             if (localData) {
                 const localMeals = JSON.parse(localData);
