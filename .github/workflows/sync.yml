@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -21,18 +24,15 @@ jobs:
           cp script.js $ASSETS_DIR/
           cp favicon.ico $ASSETS_DIR/
 
-      - name: Commit and push if changes exist
+      - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add copilot.md
-          
-          # Check for staged changes. If none, exit peacefully.
+          git add MealTrackerApp/app/src/main/assets/
+          # Check if there are changes to commit
           if git diff --staged --quiet; then
-            echo "No changes to commit. Working tree clean."
-            exit 0
+            echo "No changes to commit."
+          else
+            git commit -m "Automated: Sync web assets"
+            git push
           fi
-          
-          # If there are changes, commit and push them.
-          git commit -m "Auto-merged files into markdown"
-          git push
