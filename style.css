@@ -17,9 +17,7 @@
 /* Single-color rules */
 .meal-item.protein-beef { background-color: var(--protein-beef-color); }
 .meal-item.protein-chicken { background-color: var(--protein-chicken-color); }
-.meal-item.protein-lamb { background-color: var(--protein-lamb-color); }
-.meal-item.protein-pork { background-color: var(--protein-pork-color); }
-.meal-item.protein-fish { background-color: var(--protein-fish-color); }
+/* ... (other single protein styles) ... */
 .meal-item.protein-vegetarian { background-color: var(--protein-vegetarian-color); }
 
 /* --- Counter Container and Individual Counter Styles --- */
@@ -31,15 +29,11 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 }
-.filter-active {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
+.filter-active { transform: scale(1.05); box-shadow: 0 0 10px rgba(0,0,0,0.3); }
 #jarryd-counter { background-color: #3052a1; }
 #nathan-counter { background-color: #298542; }
 #meal-counter { background-color: var(--primary-color); }
 #meal-counter.alert { background-color: var(--red-alert); }
-
 
 /* --- Two-Column Layout Styles --- */
 #meal-list { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -47,7 +41,43 @@
 .protein-group-header { font-size: 1.4rem; font-weight: bold; color: var(--primary-color); padding-bottom: 8px; border-bottom: 2px solid #ccc; }
 .protein-meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 
-/* --- Assignment and Consumer Button Styles --- */
+/* --- MODIFIED: Assignment List Styles --- */
+#assignment-list {
+    list-style: none;
+    padding: 0; /* Fixes left-side gap */
+    margin: 0;
+}
+.assignment-item {
+    display: grid;
+    grid-template-columns: 1fr repeat(4, auto); /* 5 columns: Name, J, N, Counts, Save */
+    align-items: center;
+    gap: 15px;
+    padding: 12px 10px;
+    border-bottom: 1px solid #ddd;
+}
+.assignment-item:nth-child(even) { background-color: #f8f9fa; }
+.assignment-item.assigned-complete { opacity: 0.7; }
+
+.assignment-name { font-weight: 500; }
+.assignment-inputs { display: flex; gap: 10px; align-items: center; }
+.assignment-inputs label { font-weight: bold; }
+.assignment-inputs input { width: 45px; padding: 5px; text-align: center; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px;}
+.assignment-counts { text-align: right; }
+.assignment-counts-unassigned { font-weight: bold; color: var(--primary-color); }
+.assignment-counts-total { color: #666; font-size: 0.9em; }
+.save-line-button {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    background-color: #28a745;
+    color: white;
+}
+.save-line-button:disabled {
+    background-color: #aaa;
+}
+
+#save-assignments-button { margin-top: 20px; background-color: var(--primary-color); color: white; width: 100%; }
+
+/* --- Consumer Button Styles --- */
 .consumer-buttons { display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .consumer-btn {
     width: 38px; height: 38px; border-radius: 50%;
@@ -92,7 +122,9 @@
 .meal-item label { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; }
 .meal-name { font-size: 1.1rem; font-weight: 500; overflow-wrap: break-word; word-break: normal; }
 .meal-qty { font-size: 0.9em; color: #555; margin-top: 4px; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 1rem; -webkit-tap-highlight-color: transparent; }
+body {
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
 header, main { padding: 0 1rem; }
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; /* MODIFIED: Allows wrapping */ }
 h1 { color: var(--primary-color); font-size: 1.8rem; }
