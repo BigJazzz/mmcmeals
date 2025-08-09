@@ -17,7 +17,9 @@
 /* Single-color rules */
 .meal-item.protein-beef { background-color: var(--protein-beef-color); }
 .meal-item.protein-chicken { background-color: var(--protein-chicken-color); }
-/* ... (other single protein styles) ... */
+.meal-item.protein-lamb { background-color: var(--protein-lamb-color); }
+.meal-item.protein-pork { background-color: var(--protein-pork-color); }
+.meal-item.protein-fish { background-color: var(--protein-fish-color); }
 .meal-item.protein-vegetarian { background-color: var(--protein-vegetarian-color); }
 
 /* --- Counter Container and Individual Counter Styles --- */
