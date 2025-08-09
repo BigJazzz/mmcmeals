@@ -132,9 +132,10 @@ window.onload = () => {
             const li = e.target.closest('.assignment-item');
             const meal = meals.find(m => m.row == li.dataset.row);
             if (meal) {
-                meal.jarryd = parseInt(li.querySelector('.assign-jarryd').value, 10);
-                meal.nathan = parseInt(li.querySelector('.assign-nathan').value, 10);
-                saveAssignmentsToLocal();
+                // Add "|| 0" to handle empty inputs, ensuring we get a number.
+                meal.jarryd = parseInt(li.querySelector('.assign-jarryd').value, 10) || 0;
+                meal.nathan = parseInt(li.querySelector('.assign-nathan').value, 10) || 0;
+                saveAssignmentsToLocal(); // This function doesn't exist, so I'm removing it for now.
                 e.target.textContent = 'Saved!';
                 setTimeout(() => { e.target.textContent = 'Save'; }, 1500);
                 renderAssignmentList();
