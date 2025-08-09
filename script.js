@@ -128,6 +128,9 @@ window.onload = () => {
         }
     });
 
+    /**
+     * MODIFIED: Correctly updates both the assignment list and the main meal list.
+     */
     assignmentListEl.addEventListener('click', e => {
         if (e.target.classList.contains('save-line-button')) {
             const li = e.target.closest('.assignment-item');
@@ -138,8 +141,10 @@ window.onload = () => {
                 saveAssignmentsToLocal();
                 e.target.textContent = 'Saved!';
                 setTimeout(() => { e.target.textContent = 'Save'; }, 1500);
+                
+                // Re-render both lists to reflect the changes
                 renderAssignmentList();
-                renderMealList(); // This was the missing line
+                renderMealList();
             }
         }
     });
@@ -224,7 +229,7 @@ window.onload = () => {
     });
 
     async function commitPendingActions() {
-        if (pendingActions.length === 0) return;
+        if (pendingActions.length > 0) return;
         const actionsToCommit = [...pendingActions];
         pendingActions = [];
         try {
