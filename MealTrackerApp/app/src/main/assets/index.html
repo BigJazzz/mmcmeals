@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Meal Tracker</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <script>
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'style.css?t=' + Date.now();
+        document.head.appendChild(css);
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Meal Tracker</h1>
+        <button id="blackout" onclick="Android.blackout()">Blackout</button>
+        <div id="counter-container">
+            <div id="jarryd-counter">J --</div>
+            <div id="nathan-counter">N --</div>
+            <div id="meal-counter">--</div>
+        </div>
+    </header>
+    <main>
+        <div id="ios-tabs" class="tabs hidden">
+            <button class="tab-link active" onclick="openTab(event, 'List')">Meal List</button>
+            <button class="tab-link" onclick="openTab(event, 'Assign')">Assign</button>
+            <button id="import-tab-button" class="tab-link" onclick="openTab(event, 'Upload')">Import</button>
+        </div>
+
+        <div id="List" class="tab-content">
+            <ul id="meal-list"></ul>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
+        </div>
+
+        <div id="Assign" class="tab-content hidden">
+            <div id="assignment-list-container">
+                <ul id="assignment-list"></ul>
+                <button id="save-assignments-button">Save Assignments</button>
+            </div>
+        </div>
+
+        <div id="Upload" class="tab-content hidden">
+            <div class="upload-area">
+                <p>Import the latest order from Gmail.</p>
+                <button id="import-email-button">Import from Email</button>
+            </div>
+        </div>
+    </main>
+    <div id="undo-banner" class="hidden">
+        <span id="undo-message">Consumed 1 meal</span>
+        <button id="undo-button">Undo</button>
+        <div class="progress-bar"><div id="progress-bar-inner"></div></div>
+    </div>
+    <div id="duplicate-modal" class="modal hidden">
+        <div class="modal-content">
+            <p id="modal-message">The newest unread email has already been imported. Do you want to import it again?</p>
+            <div class="modal-actions">
+              <button id="modal-continue" class="modal-btn">Yes</button>
+              <button id="modal-cancel" class="modal-btn cancel">No</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        var script = document.createElement('script');
+        script.src = 'script.js?t=' + Date.now();
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
