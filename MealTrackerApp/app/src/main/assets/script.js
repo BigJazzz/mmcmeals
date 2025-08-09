@@ -1,8 +1,8 @@
 window.onload = () => {
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv4lTtqAyle1X5-inx5FUmUXoXpAMGVr0wVGpFZgus0IOB_MEDvV11JcQKa325RLbf/exec';
 
-    const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
-    const PROTEIN_ORDER = [  'protein-lamb', 'protein-pork', 'protein-fish', 'protein-vegetarian', 'protein-chicken', 'protein-beef' ];
+    const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'bolognese': 'protein-beef', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
+    const PROTEIN_ORDER = [ 'protein-vegetarian', 'protein-lamb', 'protein-pork', 'protein-fish', 'protein-chicken', 'protein-beef' ];
 
     // --- DOM ELEMENTS ---
     const blackoutScreen = document.getElementById('blackout-screen');
@@ -35,23 +35,19 @@ window.onload = () => {
     setupBlackoutButton();
     loadMealsAndStartChecker();
 
-    // --- NEW: Blackout Logic ---
+    // --- Blackout Logic ---
     function setupBlackoutButton() {
-        // The "Android" object is injected by the WebView in your Android app
         if (window.Android) {
             blackoutButton.classList.remove('hidden');
             blackoutButton.addEventListener('click', () => {
-                // Call the function defined in your Android app's MainActivity.kt
                 window.Android.toggleBlackout();
             });
         }
     }
 
-    // This function can be called FROM the Android app to toggle the blackout screen
     function toggleBlackout(isBlackedOut) {
         blackoutScreen.classList.toggle('hidden', !isBlackedOut);
     }
-    // Make the function globally accessible for the Android app to call
     window.toggleBlackout = toggleBlackout;
 
 
@@ -71,6 +67,11 @@ window.onload = () => {
         if (foundProteins.length === 0) return ['protein-vegetarian'];
         foundProteins.sort((a, b) => a.index - b.index);
         return [...new Set(foundProteins.map(p => p.className))];
+    }
+    
+    // --- LOCAL CACHING ---
+    function saveAssignmentsToLocal() {
+        localStorage.setItem('pendingMealAssignments', JSON.stringify(meals));
     }
 
     // --- Assignment Logic ---
@@ -132,13 +133,13 @@ window.onload = () => {
             const li = e.target.closest('.assignment-item');
             const meal = meals.find(m => m.row == li.dataset.row);
             if (meal) {
-                // Add "|| 0" to handle empty inputs, ensuring we get a number.
-                meal.jarryd = parseInt(li.querySelector('.assign-jarryd').value, 10) || 0;
-                meal.nathan = parseInt(li.querySelector('.assign-nathan').value, 10) || 0;
-                saveAssignmentsToLocal(); // This function doesn't exist, so I'm removing it for now.
+                meal.jarryd = parseInt(li.querySelector('.assign-jarryd').value, 10);
+                meal.nathan = parseInt(li.querySelector('.assign-nathan').value, 10);
+                saveAssignmentsToLocal();
                 e.target.textContent = 'Saved!';
                 setTimeout(() => { e.target.textContent = 'Save'; }, 1500);
                 renderAssignmentList();
+                renderMealList(); // This was the missing line
             }
         }
     });
