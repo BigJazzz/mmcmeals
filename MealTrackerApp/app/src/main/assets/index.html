@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Meal Tracker</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         var css = document.createElement('link');
         css.rel = 'stylesheet';
@@ -14,9 +16,10 @@
     </script>
 </head>
 <body>
+    <div id="blackout-screen" class="hidden"></div>
+
     <header>
         <h1>Meal Tracker</h1>
-        <button id="blackout" onclick="Android.blackout()">Blackout</button>
         <div id="counter-container">
             <div id="jarryd-counter">J --</div>
             <div id="nathan-counter">N --</div>
@@ -38,7 +41,7 @@
         <div id="Assign" class="tab-content hidden">
             <div id="assignment-list-container">
                 <ul id="assignment-list"></ul>
-                <button id="save-assignments-button">Save Assignments</button>
+                <button id="save-assignments-button">Upload All Assignments</button>
             </div>
         </div>
 
@@ -54,17 +57,9 @@
         <button id="undo-button">Undo</button>
         <div class="progress-bar"><div id="progress-bar-inner"></div></div>
     </div>
-    <div id="duplicate-modal" class="modal hidden">
-        <div class="modal-content">
-            <p id="modal-message">The newest unread email has already been imported. Do you want to import it again?</p>
-            <div class="modal-actions">
-              <button id="modal-continue" class="modal-btn">Yes</button>
-              <button id="modal-cancel" class="modal-btn cancel">No</button>
-            </div>
-        </div>
-    </div>
-
     
+    <button id="blackout-button" class="hidden">Blackout</button>
+
     <script>
         var script = document.createElement('script');
         script.src = 'script.js?t=' + Date.now();

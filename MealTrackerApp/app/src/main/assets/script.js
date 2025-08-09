@@ -1,10 +1,12 @@
 window.onload = () => {
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv4lTtqAyle1X5-inx5FUmUXoXpAMGVr0wVGpFZgus0IOB_MEDvV11JcQKa325RLbf/exec';
 
-    const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'bolognese': 'protein-beef', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
-    const PROTEIN_ORDER = [ 'protein-vegetarian', 'protein-lamb', 'protein-pork', 'protein-chicken', 'protein-beef', 'protein-fish' ];
+    const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
+    const PROTEIN_ORDER = [ 'protein-chicken', 'protein-beef', 'protein-lamb', 'protein-pork', 'protein-fish', 'protein-vegetarian' ];
 
     // --- DOM ELEMENTS ---
+    const blackoutScreen = document.getElementById('blackout-screen');
+    const blackoutButton = document.getElementById('blackout-button');
     const mealCounterEl = document.getElementById('meal-counter');
     const jarrydCounterEl = document.getElementById('jarryd-counter');
     const nathanCounterEl = document.getElementById('nathan-counter');
@@ -27,24 +29,31 @@ window.onload = () => {
     let pendingActions = [];
     let currentFilter = 'all';
 
-    // --- UTILITY ---
-    /**
-     * NEW: Debounce function to delay execution of a function.
-     */
-    function debounce(func, delay = 300) {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                func.apply(this, args);
-            }, delay);
-        };
-    }
-
     // --- INITIALIZATION ---
     detectOS();
     addFilterEventListeners();
+    setupBlackoutButton();
     loadMealsAndStartChecker();
+
+    // --- NEW: Blackout Logic ---
+    function setupBlackoutButton() {
+        // The "Android" object is injected by the WebView in your Android app
+        if (window.Android) {
+            blackoutButton.classList.remove('hidden');
+            blackoutButton.addEventListener('click', () => {
+                // Call the function defined in your Android app's MainActivity.kt
+                window.Android.toggleBlackout();
+            });
+        }
+    }
+
+    // This function can be called FROM the Android app to toggle the blackout screen
+    function toggleBlackout(isBlackedOut) {
+        blackoutScreen.classList.toggle('hidden', !isBlackedOut);
+    }
+    // Make the function globally accessible for the Android app to call
+    window.toggleBlackout = toggleBlackout;
+
 
     function addFilterEventListeners() {
         jarrydCounterEl.addEventListener('click', () => { currentFilter = (currentFilter === 'jarryd') ? 'all' : 'jarryd'; renderMealList(); });
@@ -77,81 +86,82 @@ window.onload = () => {
             if (isComplete) li.classList.add('assigned-complete');
             li.dataset.row = meal.row;
             li.dataset.total = meal.total;
+            const unassignedQty = meal.total - (meal.jarryd + meal.nathan);
+
             li.innerHTML = `
-                <span>${meal.name}</span>
-                <div class="assignment-inputs">
-                    <label>J:</label> <input type="number" class="assign-jarryd" min="0" max="${meal.total}" value="${meal.jarryd}">
-                    <label>N:</label> <input type="number" class="assign-nathan" min="0" max="${meal.total}" value="${meal.nathan}">
-                    <span class="assignment-total">/ ${meal.total}</span>
-                </div>`;
+                <span class="assignment-name">${meal.name}</span>
+                <div class="assignment-controls">
+                    <div class="assignment-counts">
+                        <span class="assignment-counts-unassigned">${unassignedQty}</span>
+                        <span class="assignment-counts-total"> of ${meal.total}</span>
+                    </div>
+                    <div class="assignment-inputs">
+                        <label>J:</label> <input type="number" class="assign-jarryd" min="0" max="${meal.total}" value="${meal.jarryd}">
+                        <label>N:</label> <input type="number" class="assign-nathan" min="0" max="${meal.total}" value="${meal.nathan}">
+                    </div>
+                </div>
+                <button class="save-line-button">Save</button>
+            `;
             return li;
         };
         unassigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, false)));
         assigned.forEach(meal => assignmentListEl.appendChild(createAssignmentItem(meal, true)));
     }
     
-    /**
-     * MODIFIED: Uses the debounce utility for smoother input handling.
-     */
-    const handleAssignmentInput = debounce(e => {
+    assignmentListEl.addEventListener('input', e => {
         if (e.target.matches('.assign-jarryd, .assign-nathan')) {
             const li = e.target.closest('.assignment-item');
             const total = parseInt(li.dataset.total, 10);
             const jarrydInput = li.querySelector('.assign-jarryd');
             const nathanInput = li.querySelector('.assign-nathan');
             let jarrydVal = parseInt(jarrydInput.value, 10) || 0;
-            let nathanVal = parseInt(nathanInput.value, 10) || 0;
 
-            if (e.target.classList.contains('assign-jarryd')) {
-                if (jarrydVal > total) jarrydVal = total;
-                if (jarrydVal < 0) jarrydVal = 0;
-                jarrydInput.value = jarrydVal;
-                nathanInput.value = total - jarrydVal;
-            } else {
-                if (nathanVal > total) nathanVal = total;
-                if (nathanVal < 0) nathanVal = 0;
-                nathanInput.value = nathanVal;
-                jarrydInput.value = total - nathanVal;
-            }
+            if (jarrydVal < 0) jarrydVal = 0;
+            if (jarrydVal > total) jarrydVal = total;
+            
+            jarrydInput.value = jarrydVal;
+            nathanInput.value = total - jarrydVal;
+            
+            const unassignedSpan = li.querySelector('.assignment-counts-unassigned');
+            unassignedSpan.textContent = total - (parseInt(jarrydInput.value) + parseInt(nathanInput.value));
+        }
+    });
 
+    assignmentListEl.addEventListener('click', e => {
+        if (e.target.classList.contains('save-line-button')) {
+            const li = e.target.closest('.assignment-item');
             const meal = meals.find(m => m.row == li.dataset.row);
-            if(meal) {
-                meal.jarryd = parseInt(jarrydInput.value);
-                meal.nathan = parseInt(nathanInput.value);
-            }
-
-            if ((parseInt(jarrydInput.value) + parseInt(nathanInput.value)) === total) {
+            if (meal) {
+                meal.jarryd = parseInt(li.querySelector('.assign-jarryd').value, 10);
+                meal.nathan = parseInt(li.querySelector('.assign-nathan').value, 10);
+                saveAssignmentsToLocal();
+                e.target.textContent = 'Saved!';
+                setTimeout(() => { e.target.textContent = 'Save'; }, 1500);
                 renderAssignmentList();
-            } else {
-                li.classList.remove('assigned-complete');
             }
         }
     });
 
-    assignmentListEl.addEventListener('input', handleAssignmentInput);
-
     saveAssignmentsButton.addEventListener('click', async () => {
-        const payload = [];
-        document.querySelectorAll('#assignment-list .assignment-item').forEach(li => {
-            payload.push({
-                row: li.dataset.row,
-                jarryd: li.querySelector('.assign-jarryd').value,
-                nathan: li.querySelector('.assign-nathan').value
-            });
-        });
-        setLoading(true);
+        const payload = meals.map(m => ({ row: m.row, jarryd: m.jarryd, nathan: m.nathan }));
+        
+        saveAssignmentsButton.disabled = true;
+        saveAssignmentsButton.textContent = 'Uploading...';
+        
         try {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'saveAssignments', payload })
             });
+            localStorage.removeItem('pendingMealAssignments');
             await refreshMealList();
-            alert('Assignments saved!');
+            alert('All assignments have been uploaded to the spreadsheet!');
         } catch (err) {
-            alert('Error saving assignments.');
+            alert('Error uploading assignments. Your changes are still saved locally.');
         } finally {
-            setLoading(false);
+            saveAssignmentsButton.disabled = false;
+            saveAssignmentsButton.textContent = 'Upload All Assignments';
         }
     });
     
@@ -237,6 +247,18 @@ window.onload = () => {
             const response = await fetch(`${SCRIPT_URL}?action=getMeals`);
             if (!response.ok) throw new Error(`Network response was not ok`);
             let fetchedMeals = await response.json();
+            const localData = localStorage.getItem('pendingMealAssignments');
+            if (localData) {
+                const localMeals = JSON.parse(localData);
+                const localMap = new Map(localMeals.map(m => [m.row, m]));
+                fetchedMeals.forEach(meal => {
+                    if (localMap.has(meal.row)) {
+                        const local = localMap.get(meal.row);
+                        meal.jarryd = local.jarryd;
+                        meal.nathan = local.nathan;
+                    }
+                });
+            }
             fetchedMeals.sort((a, b) => {
                 const aProteins = getProteinTypes(a.name);
                 const bProteins = getProteinTypes(b.name);
@@ -307,6 +329,7 @@ window.onload = () => {
                 groupContainer.appendChild(header);
                 const mealGrid = document.createElement('div');
                 mealGrid.className = 'protein-meal-grid';
+                
                 groups[groupName].forEach(meal => {
                     const li = document.createElement('li');
                     const proteinClasses = getProteinTypes(meal.name);
@@ -354,65 +377,39 @@ window.onload = () => {
     }
 
     importEmailButton.addEventListener('click', async () => {
+        importEmailButton.disabled = true;
+        importEmailButton.textContent = 'Checking...';
         setLoading(true);
         try {
             const checkResponse = await fetch(`${SCRIPT_URL}?action=checkLastEmail`);
             const checkResult = await checkResponse.json();
-    
+            let proceed = false;
             if (checkResult.status === 'confirmation_needed') {
-                showModal(checkResult.message, async () => {
-                    await importAndRefreshMeals();
-                });
-                return; // halt here until modal choice is made
+                if (confirm(checkResult.message)) proceed = true;
+            } else if (checkResult.status === 'no_new_email') {
+                alert('No new unread meal emails found.');
+            } else {
+                proceed = true;
             }
-    
-            if (checkResult.status === 'no_new_email') {
-                alert("No new unread email found.");
-                return;
+            if (proceed) {
+                importEmailButton.textContent = 'Importing...';
+                const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
+                const importResult = await importResponse.json();
+                alert(importResult.message);
+                if (importResult.status === 'success') await refreshMealList();
             }
-    
-            await importAndRefreshMeals();
         } catch (err) {
-            alert("A client-side error occurred while checking/importing email.");
+            alert("A client-side error occurred during the import process.");
         } finally {
+            importEmailButton.disabled = false;
+            importEmailButton.textContent = 'Import from Email';
             setLoading(false);
         }
     });
-    
-    async function importAndRefreshMeals() {
-        const importResponse = await fetch(`${SCRIPT_URL}?action=importFromGmail`);
-        const importResult = await importResponse.json();
-        alert(importResult.message);
-        if (importResult.status === 'success') await refreshMealList();
-    }
-    
-    function showModal(message, onContinue) {
-        const modal = document.getElementById('duplicate-modal');
-        const messageEl = document.getElementById('modal-message');
-        const continueBtn = document.getElementById('modal-continue');
-        const cancelBtn = document.getElementById('modal-cancel');
-    
-        messageEl.textContent = message;
-        modal.classList.remove('hidden');
-    
-        const closeModal = () => modal.classList.add('hidden');
-    
-        continueBtn.onclick = () => {
-            closeModal();
-            if (typeof onContinue === 'function') onContinue();
-        };
-    
-        cancelBtn.onclick = () => closeModal();
-    }
 
     function setLoading(isLoading) {
         loadingSpinner.style.display = isLoading ? 'block' : 'none';
         mealListEl.style.display = isLoading ? 'none' : 'grid';
-    
-        document.querySelectorAll('button').forEach(btn => {
-            btn.disabled = isLoading;
-            btn.classList.toggle('disabled', isLoading); // optional for styling
-        });
     }
 
     function detectOS() {
