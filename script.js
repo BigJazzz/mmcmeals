@@ -2,7 +2,7 @@ window.onload = () => {
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv4lTtqAyle1X5-inx5FUmUXoXpAMGVr0wVGpFZgus0IOB_MEDvV11JcQKa325RLbf/exec';
 
     const PROTEIN_MAP = { 'chicken': 'protein-chicken', 'bolognese': 'protein-beef', 'beef': 'protein-beef', 'brisket': 'protein-beef', 'lamb': 'protein-lamb', 'pork': 'protein-pork', 'fish': 'protein-fish', 'salmon': 'protein-fish' };
-    const PROTEIN_ORDER = [ 'protein-vegetarian', 'protein-lamb', 'protein-pork', 'protein-fish' 'protein-chicken', 'protein-beef' ];
+    const PROTEIN_ORDER = [ 'protein-vegetarian', 'protein-lamb', 'protein-pork', 'protein-fish', 'protein-chicken', 'protein-beef' ];
 
     // --- DOM ELEMENTS ---
     const mealCounterEl = document.getElementById('meal-counter');
