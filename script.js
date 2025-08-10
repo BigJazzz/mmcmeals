@@ -257,7 +257,7 @@ window.onload = () => {
             }
 
             const responseData = await response.json();
-            console.log("Full response from backend:", responseData); // Log the full response
+            let fetchedMeals = null; // Initialize as null
 
             // Check if the response has a 'data' property that is an array
             if (responseData && Array.isArray(responseData.data)) {
@@ -266,17 +266,20 @@ window.onload = () => {
             // Check if the response itself is an array
             else if (Array.isArray(responseData)) {
                 fetchedMeals = responseData;
-            } 
-            // If it's neither, the format is unexpected
-            else {
-                throw new Error("Received unexpected data format from backend.");
+            }
+
+            // --- IMPORTANT FIX ---
+            // Only proceed if fetchedMeals is an array with content
+            if (!Array.isArray(fetchedMeals)) {
+                console.warn("Fetched meals data is not an array or is null. Using empty array.", responseData);
+                fetchedMeals = []; // Default to an empty array to prevent crashes
             }
 
             const localData = localStorage.getItem('pendingMealAssignments');
             if (localData) {
                 const localMeals = JSON.parse(localData);
                 const localMap = new Map(localMeals.map(m => [m.row, m]));
-                fetchedMeals.forEach(meal => {
+                fetchedMeals.forEach(meal => { // This is now safe
                     if (localMap.has(meal.row)) {
                         const local = localMap.get(meal.row);
                         meal.jarryd = local.jarryd;
@@ -284,6 +287,7 @@ window.onload = () => {
                     }
                 });
             }
+            
             fetchedMeals.sort((a, b) => {
                 const aProteins = getProteinTypes(a.name);
                 const bProteins = getProteinTypes(b.name);
@@ -292,12 +296,18 @@ window.onload = () => {
                 if (aRank !== bRank) return aRank - bRank;
                 return a.name.localeCompare(b.name);
             });
+            
             meals = fetchedMeals;
             renderMealList();
             renderAssignmentList();
+            // --- END OF FIX ---
+
         } catch (err) {
             console.error("Error loading meals:", err);
             alert("Could not load meals from the backend.");
+            meals = []; // Ensure meals is an empty array on error
+            renderMealList(); // Re-render to show empty state
+            renderAssignmentList();
         } finally {
             setLoading(false);
         }
