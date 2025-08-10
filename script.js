@@ -399,6 +399,12 @@ window.onload = () => {
     }
     
     function updateMealCounter(mealList) {
+        // Add a guard clause to ensure mealList is a valid array
+        if (!Array.isArray(mealList)) {
+            console.error("updateMealCounter was called with invalid data. Defaulting to empty array.", mealList);
+            mealList = [];
+        }
+
         const jarrydTotal = mealList.reduce((sum, m) => sum + m.jarryd, 0);
         const nathanTotal = mealList.reduce((sum, m) => sum + m.nathan, 0);
         const grandTotal = jarrydTotal + nathanTotal;
