@@ -252,9 +252,26 @@ window.onload = () => {
         setLoading(true);
         try {
             const response = await fetch(`${SCRIPT_URL}?action=getMeals`);
-            if (!response.ok) throw new Error(`Network response was not ok`);
-            let fetchedMeals = await response.json();
-            console.log("Data received from backend:", fetchedMeals); 
+            if (!response.ok) {
+                throw new Error(`Network response was not ok, status: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            console.log("Full response from backend:", responseData); // Log the full response
+
+            // Check if the response has a 'data' property that is an array
+            if (responseData && Array.isArray(responseData.data)) {
+                fetchedMeals = responseData.data;
+            } 
+            // Check if the response itself is an array
+            else if (Array.isArray(responseData)) {
+                fetchedMeals = responseData;
+            } 
+            // If it's neither, the format is unexpected
+            else {
+                throw new Error("Received unexpected data format from backend.");
+            }
+
             const localData = localStorage.getItem('pendingMealAssignments');
             if (localData) {
                 const localMeals = JSON.parse(localData);
