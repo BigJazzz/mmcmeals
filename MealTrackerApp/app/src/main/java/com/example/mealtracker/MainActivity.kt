@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         // Configure WebView
         webView.settings.javaScriptEnabled = true
+        webView.settings.domStorageEnabled = true
 
         // Set up clients for WebView
         webView.webViewClient = object : WebViewClient() {
