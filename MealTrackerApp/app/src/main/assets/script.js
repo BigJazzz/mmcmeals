@@ -174,7 +174,6 @@ window.onload = () => {
     
     // --- Main Rendering and Data Logic ---
     function consumeMeal(rowIndex, person) {
-        if (pendingActions.length > 0) return;
         const meal = meals.find(m => m.row === rowIndex);
         if (!meal) return;
         const personQty = person.toLowerCase() === 'jarryd' ? meal.jarryd : meal.nathan;
@@ -229,7 +228,7 @@ window.onload = () => {
     });
 
     async function commitPendingActions() {
-        if (pendingActions.length > 0) return;
+        if (pendingActions.length === 0) return;
         const actionsToCommit = [...pendingActions];
         pendingActions = [];
         try {
